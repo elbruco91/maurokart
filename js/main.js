@@ -1,6 +1,8 @@
 import * as state from './state.js';
 import * as gameScreen from './screens/game.js';
 import * as modals from './ui/modals.js';
+import { loadQuestions } from './data/questionPool.js';
+import { setQuestions } from './engine/turnEngine.js';
 
 const screens = {
   menu: document.getElementById('screen-menu'),
@@ -23,7 +25,7 @@ function startTestRace() {
   gameScreen.render();
 }
 
-function init() {
+async function init() {
   modals.init(document.getElementById('modal-root'));
 
   gameScreen.init(
@@ -50,9 +52,17 @@ function init() {
     goToMenu,
   );
 
-  document.getElementById('start-test-race-btn').addEventListener('click', startTestRace);
+  const startBtn = document.getElementById('start-test-race-btn');
+  startBtn.addEventListener('click', startTestRace);
 
   showScreen('menu');
+
+  startBtn.disabled = true;
+  startBtn.textContent = 'Caricamento domande...';
+  const questions = await loadQuestions();
+  setQuestions(questions);
+  startBtn.disabled = false;
+  startBtn.textContent = 'Avvia partita di test';
 }
 
 document.addEventListener('DOMContentLoaded', init);

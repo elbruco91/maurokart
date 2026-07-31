@@ -1,9 +1,13 @@
 import { rollDie } from './dice.js';
 import { moveProgress } from './board.js';
-import { createQuestionPool, SAMPLE_QUESTIONS } from '../data/questionPool.js';
+import { drawQuestion } from '../data/questionPool.js';
 import { saveState } from '../state.js';
 
-const pool = createQuestionPool(SAMPLE_QUESTIONS);
+let questionList = [];
+
+function setQuestions(list) {
+  questionList = list;
+}
 
 function currentPlayer(state) {
   return state.players[state.currentPlayerIndex];
@@ -52,7 +56,7 @@ function rollDice1(state) {
 }
 
 function showQuestion(state) {
-  const q = pool.draw();
+  const q = drawQuestion(state, questionList);
   state.currentTurn.question = q;
   state.turnPhase = 'reveal';
   saveState();
@@ -107,6 +111,7 @@ function manualMove(state, playerId, delta) {
 }
 
 export {
+  setQuestions,
   currentPlayer,
   getPhaseConfig,
   advancePhase,
