@@ -1,8 +1,14 @@
 const SAMPLE_QUESTIONS = [
-  { domanda: 'Domanda di prova 1: cosa fa una variabile in un programma?', risposta: 'Contiene un valore a cui si puo dare un nome, riutilizzabile nel codice.' },
-  { domanda: 'Domanda di prova 2: a cosa serve un ciclo (loop)?', risposta: 'A ripetere una serie di istruzioni piu volte senza riscriverle.' },
-  { domanda: 'Domanda di prova 3: cosa e una funzione?', risposta: 'Un blocco di codice riutilizzabile che esegue un compito specifico.' },
-  { domanda: 'Domanda di prova 4: cosa significa debug?', risposta: 'Trovare e correggere errori in un programma.' },
+  { domanda: 'Quanto fa 2 + 2?', risposta: '4' },
+  { domanda: 'Quanto fa 5 + 7?', risposta: '12' },
+  { domanda: 'Quanto fa 9 - 3?', risposta: '6' },
+  { domanda: 'Quanto fa 10 - 4?', risposta: '6' },
+  { domanda: 'Quanto fa 3 x 3?', risposta: '9' },
+  { domanda: 'Quanto fa 4 x 5?', risposta: '20' },
+  { domanda: 'Quanto fa 12 : 4?', risposta: '3' },
+  { domanda: 'Quanto fa 20 : 5?', risposta: '4' },
+  { domanda: 'Quanto fa 6 + 8?', risposta: '14' },
+  { domanda: 'Quanto fa 15 - 9?', risposta: '6' },
 ];
 
 function createQuestionPool(list) {
