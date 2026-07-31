@@ -1,0 +1,153 @@
+:root {
+  --color-bg: #1b2432;
+  --color-panel: #26314533;
+  --color-panel-solid: #263145;
+  --color-text: #f2f4f8;
+  --color-accent: #ffb703;
+  --color-accent-dark: #e0940a;
+  --color-success: #43a047;
+  --color-danger: #e53935;
+  --cell-size: 60px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Segoe UI', Verdana, Arial, sans-serif;
+  font-size: 18px;
+}
+
+h1, h2, h3 {
+  margin: 0 0 0.4em 0;
+}
+
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.screen.active {
+  display: block;
+}
+
+.btn {
+  font-size: 1em;
+  font-weight: 600;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text);
+  background: #3a4a63;
+  transition: transform 0.08s ease, filter 0.15s ease;
+}
+
+.btn:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--color-accent-dark);
+  color: #1b2432;
+}
+
+.btn-success {
+  background: var(--color-success);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid #f2f4f866;
+}
+
+.btn-loot {
+  background: linear-gradient(135deg, #8e24aa, #d81b60);
+}
+
+.btn-large {
+  font-size: 1.4em;
+  padding: 18px 28px;
+  width: 100%;
+}
+
+.btn-small {
+  font-size: 0.85em;
+  padding: 8px 14px;
+}
+
+.modal-root {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-root.open {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--color-panel-solid);
+  padding: 28px;
+  border-radius: 14px;
+  min-width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modal-box p {
+  font-size: 1.15em;
+}
+
+.modal-box select,
+.modal-box input {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  font-size: 1em;
+  border-radius: 8px;
+  border: none;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.menu-box {
+  max-width: 480px;
+  margin: 10vh auto;
+  text-align: center;
+}
+
+.menu-subtitle {
+  opacity: 0.7;
+  margin-bottom: 32px;
+}

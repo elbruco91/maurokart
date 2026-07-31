@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MauroKart</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/game.css" />
+</head>
+<body>
+
+<section id="screen-menu" class="screen active">
+  <div class="menu-box">
+    <h1>MauroKart</h1>
+    <p class="menu-subtitle">Fase 1 - motore di gioco (versione di test)</p>
+    <button id="start-test-race-btn" class="btn btn-primary btn-large">Avvia partita di test</button>
+  </div>
+</section>
+
+<section id="screen-game" class="screen">
+  <header class="game-header">
+    <h1>MauroKart</h1>
+    <div class="current-player">Turno di: <span id="current-player-label"></span></div>
+    <button id="exit-btn" class="btn btn-outline">Esci / Pausa</button>
+  </header>
+
+  <div id="finish-banner" class="finish-banner"></div>
+
+  <main class="game-main">
+    <div class="track-panel">
+      <div id="track-container"></div>
+    </div>
+
+    <div class="side-panel">
+      <div class="players-box">
+        <h2>Giocatori</h2>
+        <div id="player-list"></div>
+      </div>
+
+      <div class="controls-box">
+        <div id="dice" class="dice">-</div>
+
+        <button id="main-action-btn" class="btn btn-primary btn-large"></button>
+
+        <div id="evaluate-row" class="evaluate-row">
+          <button id="correct-btn" class="btn btn-success">Corretto</button>
+          <button id="wrong-btn" class="btn btn-danger">Errato</button>
+        </div>
+
+        <div id="question-box" class="question-box">
+          <p id="question-text" class="question-text"></p>
+          <p id="answer-text" class="answer-text"></p>
+        </div>
+
+        <button id="loot-btn" class="btn btn-loot">Loot</button>
+
+        <div class="manual-controls">
+          <button id="advance-btn" class="btn btn-small">Avanti</button>
+          <button id="retreat-btn" class="btn btn-small">Indietro</button>
+          <button id="manual-adjust-btn" class="btn btn-small">Assegna/togli caselle</button>
+        </div>
+      </div>
+
+      <div class="log-box">
+        <h2>Storico turni</h2>
+        <div id="log-container" class="log-container"></div>
+      </div>
+    </div>
+  </main>
+</section>
+
+<div id="modal-root" class="modal-root"></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
