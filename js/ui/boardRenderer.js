@@ -10,7 +10,7 @@ const CELL_ICONS = {
   lootbox: '?',
 };
 
-const CELL_GAP = 6;
+const CELL_GAP = 1;
 const MAX_ANIMATED_HOPS = 20;
 
 let pawnEls = {};
