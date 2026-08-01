@@ -76,6 +76,22 @@ function checkerOrientation(cells, index) {
   return neighbor.row === self.row ? 'vertical' : 'horizontal';
 }
 
+function roadOrientation(cells, index) {
+  if (cells.length < 2) return null;
+  if (index === 0) {
+    const dir = dirBetween(cells[0], cells[1]);
+    return dir === 'East' || dir === 'West' ? 'horizontal' : 'vertical';
+  }
+  if (index === cells.length - 1) {
+    const dir = dirBetween(cells[index - 1], cells[index]);
+    return dir === 'East' || dir === 'West' ? 'horizontal' : 'vertical';
+  }
+  const dirIn = dirBetween(cells[index - 1], cells[index]);
+  const dirOut = dirBetween(cells[index], cells[index + 1]);
+  if (dirIn !== dirOut) return null;
+  return dirIn === 'East' || dirIn === 'West' ? 'horizontal' : 'vertical';
+}
+
 function renderCells(grid, track, state) {
   grid.innerHTML = '';
   track.cells.forEach((cell) => {
@@ -108,6 +124,14 @@ function renderCells(grid, track, state) {
       const inner = document.createElement('span');
       inner.className = `curb-inner corner-${curve.innerCorner}`;
       div.appendChild(inner);
+    } else {
+      const orientation = roadOrientation(track.cells, cell.index);
+      const sides = orientation === 'horizontal' ? ['top', 'bottom'] : orientation === 'vertical' ? ['left', 'right'] : [];
+      sides.forEach((side) => {
+        const edge = document.createElement('span');
+        edge.className = `road-edge side-${side}`;
+        div.appendChild(edge);
+      });
     }
 
     grid.appendChild(div);

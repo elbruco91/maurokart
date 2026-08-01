@@ -67,7 +67,7 @@ function createRaceState({ trackId, laps, players, startOrder }) {
 
 function createTestState() {
   return createRaceState({
-    trackId: 'breve',
+    trackId: 'pista1',
     laps: 2,
     startOrder: 'manual',
     players: [

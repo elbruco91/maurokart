@@ -1,10 +1,11 @@
 import { PLAYER_COLORS } from '../state.js';
+import { getTrackLength } from '../data/tracks.default.js';
 
 const VEHICLE_ICONS = ['🏎️', '🚗', '🚙', '🚕', '🚓', '🚐', '🚚', '🛵'];
 const TRACK_OPTIONS = [
-  { id: 'breve', label: 'Breve', length: 15 },
-  { id: 'medio', label: 'Medio', length: 25 },
-  { id: 'lungo', label: 'Lungo', length: 35 },
+  { id: 'pista1', label: 'Pista 1' },
+  { id: 'pista2', label: 'Pista 2' },
+  { id: 'pista3', label: 'Pista 3' },
 ];
 
 let els = {};
@@ -12,7 +13,7 @@ let config = null;
 
 function defaultConfig() {
   return {
-    trackId: 'breve',
+    trackId: 'pista1',
     laps: 2,
     startOrder: 'random',
     players: Array.from({ length: 4 }, (_, i) => ({
@@ -40,7 +41,7 @@ function renderTrackOptions() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'btn btn-toggle';
-    btn.textContent = `${t.label} (${t.length})`;
+    btn.textContent = `${t.label} (${getTrackLength(t.id)} caselle)`;
     btn.classList.toggle('active', config.trackId === t.id);
     btn.addEventListener('click', () => {
       config.trackId = t.id;

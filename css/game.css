@@ -22,20 +22,26 @@
 .game-main {
   display: flex;
   gap: 24px;
-  align-items: flex-start;
+  align-items: stretch;
+  min-height: 640px;
 }
 
 .track-panel {
   flex: 1;
   overflow: auto;
-  background: var(--color-panel);
   border-radius: 16px;
   padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    repeating-conic-gradient(#5a9c4a 0% 25%, #4c8c3c 0% 50%) 0 0 / 16px 16px;
 }
 
 #track-container {
   position: relative;
   display: inline-block;
+  flex-shrink: 0;
 }
 
 .track-cells {
@@ -55,7 +61,7 @@
 .cell {
   width: var(--cell-size);
   height: var(--cell-size);
-  background: #33415c;
+  background: #3d3d42;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -81,6 +87,41 @@
 .cell-finish {
   border-color: var(--color-accent);
   opacity: 1;
+}
+
+.road-edge {
+  position: absolute;
+  z-index: 1;
+  background: #f2f4f8;
+  opacity: 0.9;
+}
+
+.road-edge.side-top {
+  top: 2px;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+}
+
+.road-edge.side-bottom {
+  bottom: 2px;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+}
+
+.road-edge.side-left {
+  left: 2px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+}
+
+.road-edge.side-right {
+  right: 2px;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
 }
 
 .checker-line {

@@ -4,10 +4,12 @@ import { saveCustomTrack, loadCustomTrack, clearCustomTrack } from '../data/cust
 import * as modals from '../ui/modals.js';
 
 const TRACK_OPTIONS = [
-  { id: 'breve', label: 'Breve', length: 15 },
-  { id: 'medio', label: 'Medio', length: 25 },
-  { id: 'lungo', label: 'Lungo', length: 35 },
+  { id: 'pista1', label: 'Pista 1' },
+  { id: 'pista2', label: 'Pista 2' },
+  { id: 'pista3', label: 'Pista 3' },
 ];
+
+const MAX_PIECES = 60;
 
 const CELL_TYPE_LABELS = {
   normal: '',
@@ -21,32 +23,22 @@ const CELL_TYPE_LABELS = {
 
 let els = {};
 let onExit = null;
-let trackId = 'breve';
-let trackLength = 15;
+let trackId = 'pista1';
 let pieces = [];
 let cellTypes = [];
 let mode = 'shape';
 
-function trackLengthFor(id) {
-  return TRACK_OPTIONS.find((t) => t.id === id).length;
-}
-
-function defaultCellTypes(length) {
-  return Array.from({ length }, () => ({ type: 'normal', shortcutTarget: null }));
-}
-
 function loadTrackIntoEditor(id) {
   trackId = id;
-  trackLength = trackLengthFor(id);
 
   const source = loadCustomTrack(id) || getDefaultTrack(id);
-  pieces = source.pieces ? source.pieces.slice(0, trackLength) : cellsToPieces(source.cells).slice(0, trackLength);
-  while (pieces.length < 1) pieces.push({ type: 'straight' });
+  pieces = source.pieces ? source.pieces.slice() : cellsToPieces(source.cells);
+  if (pieces.length < 1) pieces = [{ type: 'straight' }];
 
-  cellTypes = defaultCellTypes(trackLength);
-  source.cells.slice(0, trackLength).forEach((c, i) => {
-    cellTypes[i] = { type: c.type, shortcutTarget: c.shortcutTarget != null ? c.shortcutTarget : null };
-  });
+  cellTypes = source.cells.map((c) => ({
+    type: c.type,
+    shortcutTarget: c.shortcutTarget != null ? c.shortcutTarget : null,
+  }));
 }
 
 function renderTrackSelect() {
@@ -55,7 +47,7 @@ function renderTrackSelect() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'btn btn-toggle';
-    btn.textContent = `${t.label} (${t.length})`;
+    btn.textContent = t.label;
     btn.classList.toggle('active', trackId === t.id);
     btn.addEventListener('click', () => {
       loadTrackIntoEditor(t.id);
@@ -73,12 +65,17 @@ function renderModeTabs() {
 }
 
 function renderPieceCount() {
-  els.pieceCount.textContent = `${pieces.length} / ${trackLength} caselle posizionate`;
+  els.pieceCount.textContent = `${pieces.length} caselle posizionate`;
   els.undoBtn.disabled = pieces.length <= 1;
+  const atMax = pieces.length >= MAX_PIECES;
+  els.pieceStraightBtn.disabled = atMax;
+  els.pieceCurveLeftBtn.disabled = atMax;
+  els.pieceCurveRightBtn.disabled = atMax;
 }
 
 function renderPreview() {
   const { cells, rows, cols } = piecesToCells(pieces);
+  const lastIndex = cells.length - 1;
 
   els.trackContainer.innerHTML = '';
   const grid = document.createElement('div');
@@ -93,7 +90,7 @@ function renderPreview() {
     div.style.gridColumn = cell.col + 1;
     div.style.gridRow = cell.row + 1;
     if (cell.index === 0) div.classList.add('cell-start');
-    if (cell.index === trackLength - 1) div.classList.add('cell-finish');
+    if (cell.index === lastIndex) div.classList.add('cell-finish');
     const icon = CELL_TYPE_LABELS[type];
     div.innerHTML = icon
       ? `<span class="cell-num">${cell.index + 1}</span><span class="cell-icon">${icon}</span>`
@@ -110,8 +107,8 @@ function renderPreview() {
 }
 
 function openCellChooser(index) {
-  const current = cellTypes[index];
-  modals.showCellTypeChooser(index + 1, current, trackLength, ({ type, shortcutTarget }) => {
+  const current = cellTypes[index] || { type: 'normal', shortcutTarget: null };
+  modals.showCellTypeChooser(index + 1, current, pieces.length, ({ type, shortcutTarget }) => {
     cellTypes[index] = { type, shortcutTarget };
     if (type === 'shortcut_in' && shortcutTarget != null && cellTypes[shortcutTarget]) {
       cellTypes[shortcutTarget] = { type: 'shortcut_out', shortcutTarget: null };
@@ -128,8 +125,9 @@ function renderAll() {
 }
 
 function addPiece(type) {
-  if (pieces.length >= trackLength) return;
+  if (pieces.length >= MAX_PIECES) return;
   pieces.push({ type });
+  cellTypes.push({ type: 'normal', shortcutTarget: null });
   renderPieceCount();
   renderPreview();
 }
@@ -137,39 +135,26 @@ function addPiece(type) {
 function undoPiece() {
   if (pieces.length <= 1) return;
   pieces.pop();
+  cellTypes.pop();
   renderPieceCount();
   renderPreview();
 }
 
 function resetPieces() {
   pieces = [{ type: 'straight' }];
-  cellTypes = defaultCellTypes(trackLength);
+  cellTypes = [{ type: 'normal', shortcutTarget: null }];
   renderPieceCount();
   renderPreview();
 }
 
 function saveTrack() {
-  if (pieces.length !== trackLength) {
-    modals.showConfirm(
-      `La forma non e' completa (${pieces.length}/${trackLength} caselle). Vuoi salvare comunque? Le caselle mancanti verranno aggiunte come rettilinei.`,
-      () => {
-        while (pieces.length < trackLength) pieces.push({ type: 'straight' });
-        finalizeSave();
-      },
-    );
-    return;
-  }
-  finalizeSave();
-}
-
-function finalizeSave() {
   const { cells, rows, cols } = piecesToCells(pieces);
   cells.forEach((cell, i) => {
     const ct = cellTypes[i] || { type: 'normal', shortcutTarget: null };
     cell.type = ct.type;
     if (ct.shortcutTarget != null) cell.shortcutTarget = ct.shortcutTarget;
   });
-  saveCustomTrack({ id: trackId, length: trackLength, cols, rows, cells, pieces });
+  saveCustomTrack({ id: trackId, length: pieces.length, cols, rows, cells, pieces });
   renderPieceCount();
   renderPreview();
 }

@@ -30,7 +30,7 @@ function generateSnakeTrack(id, length, cols, specials) {
 }
 
 const TRACKS = {
-  breve: generateSnakeTrack('breve', 15, 6, [
+  pista1: generateSnakeTrack('pista1', 15, 6, [
     { index: 1, type: 'lootbox' },
     { index: 2, type: 'boost' },
     { index: 5, type: 'mud' },
@@ -39,7 +39,7 @@ const TRACKS = {
     { index: 10, type: 'shortcut_in', shortcutTarget: 13 },
     { index: 13, type: 'shortcut_out' },
   ]),
-  medio: generateSnakeTrack('medio', 25, 7, [
+  pista2: generateSnakeTrack('pista2', 25, 7, [
     { index: 1, type: 'lootbox' },
     { index: 3, type: 'boost' },
     { index: 8, type: 'mud' },
@@ -48,7 +48,7 @@ const TRACKS = {
     { index: 17, type: 'shortcut_in', shortcutTarget: 21 },
     { index: 21, type: 'shortcut_out' },
   ]),
-  lungo: generateSnakeTrack('lungo', 35, 8, [
+  pista3: generateSnakeTrack('pista3', 35, 8, [
     { index: 1, type: 'lootbox' },
     { index: 4, type: 'boost' },
     { index: 10, type: 'mud' },
@@ -69,4 +69,8 @@ function getDefaultTrack(id) {
   return TRACKS[id];
 }
 
-export { TRACKS, getTrack, getDefaultTrack };
+function getTrackLength(id) {
+  return getTrack(id).length;
+}
+
+export { TRACKS, getTrack, getDefaultTrack, getTrackLength };
