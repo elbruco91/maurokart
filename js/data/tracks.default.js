@@ -1,4 +1,4 @@
-function generateSnakeTrack(id, length, cols) {
+function generateSnakeTrack(id, length, cols, specials) {
   const cells = [];
   let row = 0;
   let col = 0;
@@ -16,13 +16,39 @@ function generateSnakeTrack(id, length, cols) {
     }
   }
   const rows = row + 1;
+
+  // Piazzamento provvisorio delle caselle speciali, solo per testare le meccaniche
+  // in attesa del vero editor piste (Fase 6), che sostituira' questi dati.
+  specials.forEach(({ index, type, shortcutTarget }) => {
+    cells[index].type = type;
+    if (shortcutTarget != null) cells[index].shortcutTarget = shortcutTarget;
+  });
+
   return { id, length, cols, rows, cells };
 }
 
 const TRACKS = {
-  breve: generateSnakeTrack('breve', 15, 6),
-  medio: generateSnakeTrack('medio', 25, 7),
-  lungo: generateSnakeTrack('lungo', 35, 8),
+  breve: generateSnakeTrack('breve', 15, 6, [
+    { index: 2, type: 'boost' },
+    { index: 5, type: 'mud' },
+    { index: 8, type: 'puddle' },
+    { index: 10, type: 'shortcut_in', shortcutTarget: 13 },
+    { index: 13, type: 'shortcut_out' },
+  ]),
+  medio: generateSnakeTrack('medio', 25, 7, [
+    { index: 3, type: 'boost' },
+    { index: 8, type: 'mud' },
+    { index: 14, type: 'puddle' },
+    { index: 17, type: 'shortcut_in', shortcutTarget: 21 },
+    { index: 21, type: 'shortcut_out' },
+  ]),
+  lungo: generateSnakeTrack('lungo', 35, 8, [
+    { index: 4, type: 'boost' },
+    { index: 10, type: 'mud' },
+    { index: 18, type: 'puddle' },
+    { index: 24, type: 'shortcut_in', shortcutTarget: 29 },
+    { index: 29, type: 'shortcut_out' },
+  ]),
 };
 
 function getTrack(id) {

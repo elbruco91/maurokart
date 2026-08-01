@@ -58,16 +58,51 @@
   background: #33415c;
   border-radius: 8px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
   font-size: 0.85em;
   opacity: 0.85;
   border: 2px solid transparent;
+  position: relative;
+}
+
+.cell-num {
+  font-size: 0.9em;
+}
+
+.cell-icon {
+  font-size: 1em;
+  line-height: 1;
 }
 
 .cell-start {
   border-color: var(--color-accent);
   opacity: 1;
+}
+
+.cell-boost {
+  background: #2e7d32;
+  opacity: 1;
+}
+
+.cell-mud {
+  background: #6d4c41;
+  opacity: 1;
+}
+
+.cell-puddle {
+  background: #1565c0;
+  opacity: 1;
+}
+
+.cell-shortcut_in,
+.cell-shortcut_out {
+  background: #6a1b9a;
+  opacity: 1;
+  border-style: dashed;
+  border-color: #ce93d8;
 }
 
 .pawn {

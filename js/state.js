@@ -22,6 +22,12 @@ function createPlayer(id, name, colorId) {
     lootbox: null,
     finished: false,
     finishRank: null,
+    pendingEffects: {
+      boostNextRoll1: false,
+      mudNextRoll1: false,
+      puddleArmed: false,
+      puddleReturnProgress: null,
+    },
   };
 }
 

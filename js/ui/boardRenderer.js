@@ -1,6 +1,15 @@
 import { getTrackForState, getPositionOnTrack } from '../engine/board.js';
 import { PLAYER_COLORS } from '../state.js';
 
+const CELL_ICONS = {
+  boost: '⚡',
+  mud: '≈',
+  puddle: '○',
+  shortcut_in: '➜',
+  shortcut_out: '⬅',
+  lootbox: '?',
+};
+
 function renderTrack(container, state) {
   const track = getTrackForState(state);
   container.innerHTML = '';
@@ -16,7 +25,10 @@ function renderTrack(container, state) {
     div.style.gridColumn = cell.col + 1;
     div.style.gridRow = cell.row + 1;
     if (cell.index === 0) div.classList.add('cell-start');
-    div.textContent = cell.index + 1;
+    const icon = CELL_ICONS[cell.type];
+    div.innerHTML = icon
+      ? `<span class="cell-num">${cell.index + 1}</span><span class="cell-icon">${icon}</span>`
+      : `<span class="cell-num">${cell.index + 1}</span>`;
     grid.appendChild(div);
   });
 

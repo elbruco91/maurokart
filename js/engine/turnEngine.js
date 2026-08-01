@@ -2,6 +2,7 @@ import { rollDie } from './dice.js';
 import { moveProgress } from './board.js';
 import { drawQuestion } from '../data/questionPool.js';
 import { saveState } from '../state.js';
+import { applyRoll1Modifier, consumeRoll1PendingEffects, applyLandingEffects } from './cellEffects.js';
 
 let questionList = [];
 
@@ -46,13 +47,25 @@ function advancePhase(state) {
 
 function rollDice1(state) {
   const p = currentPlayer(state);
-  const roll = rollDie();
-  state.currentTurn.roll1 = roll;
-  moveProgress(state, p, roll);
-  addLog(state, `Pedina ${p.name}: Dado 1 = ${roll}`);
+  const rawRoll = rollDie();
+  state.currentTurn.roll1 = rawRoll;
+
+  const { wasBoosted, wasMuddy, wasPuddleArmed } = consumeRoll1PendingEffects(p);
+
+  if (wasPuddleArmed && rawRoll === 6) {
+    p.progress = p.pendingEffects.puddleReturnProgress;
+    addLog(state, `Pedina ${p.name}: Dado 1 = 6, cade nella pozza e torna indietro!`);
+  } else {
+    const movement = applyRoll1Modifier(rawRoll, wasBoosted, wasMuddy);
+    moveProgress(state, p, movement);
+    const note = wasBoosted ? ' (boost)' : wasMuddy ? ' (fango)' : '';
+    addLog(state, `Pedina ${p.name}: Dado 1 = ${rawRoll}${note} -> avanza di ${movement}`);
+  }
+
+  applyLandingEffects(state, p, addLog);
   state.turnPhase = 'question';
   saveState();
-  return roll;
+  return rawRoll;
 }
 
 function showQuestion(state) {
@@ -85,6 +98,8 @@ function rollDice2(state) {
   if (p.finished) {
     addLog(state, `Pedina ${p.name} ha tagliato il traguardo!`);
     state.raceStatus = 'finished';
+  } else {
+    applyLandingEffects(state, p, addLog);
   }
   state.turnPhase = 'nextTurn';
   saveState();
