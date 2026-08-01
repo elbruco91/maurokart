@@ -185,8 +185,13 @@ function activateLoot(state, direction) {
   p.lootbox = null;
 
   if (itemId === 'redraw') {
-    state.currentTurn.redrawCredit = true;
-    addLog(state, `Pedina ${p.name}: attiva Ritira la domanda (disponibile quando verra' mostrata)`);
+    if (state.currentTurn.question) {
+      state.currentTurn.question = drawQuestion(state, questionList);
+      addLog(state, `Pedina ${p.name}: ridisegna la domanda`);
+    } else {
+      state.currentTurn.redrawCredit = true;
+      addLog(state, `Pedina ${p.name}: attiva Ritira la domanda (disponibile quando verra' mostrata)`);
+    }
   } else {
     activateSimpleItem(state, p, itemId, direction, addLog, moveProgress, applyLandingEffects);
   }

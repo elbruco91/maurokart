@@ -7,8 +7,6 @@ import { animateDie } from '../engine/dice.js';
 import { PLAYER_COLORS } from '../state.js';
 import { LOOT_ITEMS } from '../data/lootbox.js';
 
-const LOOT_WINDOW_PHASES = ['start'];
-
 let els = {};
 let onExitCallback = null;
 
@@ -105,7 +103,7 @@ function render() {
   els.currentPlayerLabel.style.color = PLAYER_COLORS[engine.currentPlayer(s).colorId].hex;
 
   const cp = engine.currentPlayer(s);
-  const canUseLoot = !!cp.lootbox && LOOT_WINDOW_PHASES.includes(s.turnPhase) && !finished;
+  const canUseLoot = !!cp.lootbox && !finished;
   els.lootBtn.disabled = !canUseLoot;
   els.lootBtn.textContent = cp.lootbox ? `Loot: ${LOOT_ITEMS[cp.lootbox].name}` : 'Loot';
 
