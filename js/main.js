@@ -3,6 +3,7 @@ import * as gameScreen from './screens/game.js';
 import * as modals from './ui/modals.js';
 import { loadQuestions } from './data/questionPool.js';
 import { setQuestions } from './engine/turnEngine.js';
+import { computeRoundBoxAssignment } from './data/lootbox.js';
 
 const screens = {
   menu: document.getElementById('screen-menu'),
@@ -20,7 +21,9 @@ function goToMenu() {
 }
 
 function startTestRace() {
-  state.setState(state.createTestState());
+  const s = state.createTestState();
+  s.roundBoxAssignment = computeRoundBoxAssignment(s);
+  state.setState(s);
   showScreen('game');
   gameScreen.render();
 }

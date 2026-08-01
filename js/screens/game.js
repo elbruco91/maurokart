@@ -5,6 +5,9 @@ import { renderLog } from '../ui/log.js';
 import * as modals from '../ui/modals.js';
 import { animateDie } from '../engine/dice.js';
 import { PLAYER_COLORS } from '../state.js';
+import { LOOT_ITEMS } from '../data/lootbox.js';
+
+const LOOT_WINDOW_PHASES = ['start', 'roll1', 'question', 'reveal'];
 
 let els = {};
 let onExitCallback = null;
@@ -45,7 +48,16 @@ function init(elements, onExit) {
     });
   });
 
-  els.lootBtn.disabled = true;
+  els.lootBtn.addEventListener('click', () => {
+    const s = state.getState();
+    const p = engine.currentPlayer(s);
+    const item = LOOT_ITEMS[p.lootbox];
+    if (!item) return;
+    modals.showLootActivation(item, (direction) => {
+      engine.activateLoot(s, direction);
+      render();
+    });
+  });
 }
 
 function render() {
@@ -75,6 +87,11 @@ function render() {
   els.currentPlayerLabel.textContent = engine.currentPlayer(s).name;
   els.currentPlayerLabel.style.color = PLAYER_COLORS[engine.currentPlayer(s).colorId].hex;
 
+  const cp = engine.currentPlayer(s);
+  const canUseLoot = !!cp.lootbox && LOOT_WINDOW_PHASES.includes(s.turnPhase) && !finished;
+  els.lootBtn.disabled = !canUseLoot;
+  els.lootBtn.textContent = cp.lootbox ? `Loot: ${LOOT_ITEMS[cp.lootbox].name}` : 'Loot';
+
   els.finishBanner.style.display = finished ? 'block' : 'none';
   if (finished) {
     const winner = s.players.find((p) => p.id === s.winnerId);
@@ -94,8 +111,10 @@ function renderPlayerList(s) {
     dot.className = 'player-dot';
     dot.style.background = PLAYER_COLORS[p.colorId].hex;
     row.appendChild(dot);
+    const itemLabel = p.lootbox ? ` [${LOOT_ITEMS[p.lootbox].name}]` : '';
+    const shieldLabel = p.pendingEffects.shieldTurnsLeft > 0 ? ' 🛡' : '';
     const label = document.createElement('span');
-    label.textContent = `${p.name} - casella ${p.progress}${p.finished ? ' (arrivato)' : ''}`;
+    label.textContent = `${p.name} - casella ${p.progress}${p.finished ? ' (arrivato)' : ''}${itemLabel}${shieldLabel}`;
     row.appendChild(label);
     els.playerList.appendChild(row);
   });

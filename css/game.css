@@ -105,6 +105,17 @@
   border-color: #ce93d8;
 }
 
+.cell-lootbox {
+  background: #f9a825;
+  color: #1b2432;
+  opacity: 1;
+}
+
+.cell-hazard {
+  border-color: #ffee58;
+  border-width: 3px;
+}
+
 .pawn {
   width: calc(var(--cell-size) * 0.55);
   height: calc(var(--cell-size) * 0.55);

@@ -29,22 +29,28 @@ function generateSnakeTrack(id, length, cols, specials) {
 
 const TRACKS = {
   breve: generateSnakeTrack('breve', 15, 6, [
+    { index: 1, type: 'lootbox' },
     { index: 2, type: 'boost' },
     { index: 5, type: 'mud' },
+    { index: 7, type: 'lootbox' },
     { index: 8, type: 'puddle' },
     { index: 10, type: 'shortcut_in', shortcutTarget: 13 },
     { index: 13, type: 'shortcut_out' },
   ]),
   medio: generateSnakeTrack('medio', 25, 7, [
+    { index: 1, type: 'lootbox' },
     { index: 3, type: 'boost' },
     { index: 8, type: 'mud' },
+    { index: 11, type: 'lootbox' },
     { index: 14, type: 'puddle' },
     { index: 17, type: 'shortcut_in', shortcutTarget: 21 },
     { index: 21, type: 'shortcut_out' },
   ]),
   lungo: generateSnakeTrack('lungo', 35, 8, [
+    { index: 1, type: 'lootbox' },
     { index: 4, type: 'boost' },
     { index: 10, type: 'mud' },
+    { index: 15, type: 'lootbox' },
     { index: 18, type: 'puddle' },
     { index: 24, type: 'shortcut_in', shortcutTarget: 29 },
     { index: 29, type: 'shortcut_out' },

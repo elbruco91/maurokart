@@ -27,6 +27,11 @@ function createPlayer(id, name, colorId) {
       mudNextRoll1: false,
       puddleArmed: false,
       puddleReturnProgress: null,
+      turboNextRoll1: null,
+      shieldTurnsLeft: 0,
+      noMalusActive: false,
+      bananaArmed: false,
+      skipNextRoll1: false,
     },
   };
 }
@@ -45,6 +50,9 @@ function createTestState() {
     history: [],
     raceStatus: 'inProgress',
     winnerId: null,
+    trackHazards: {},
+    activeRockets: [],
+    roundBoxAssignment: null,
   };
 }
 

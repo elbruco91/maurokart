@@ -2,7 +2,14 @@ import { rollDie } from './dice.js';
 import { moveProgress } from './board.js';
 import { drawQuestion } from '../data/questionPool.js';
 import { saveState } from '../state.js';
-import { applyRoll1Modifier, consumeRoll1PendingEffects, applyLandingEffects } from './cellEffects.js';
+import {
+  resolveRoll1Movement,
+  consumeRoll1PendingEffects,
+  clearRoll1Modifiers,
+  applyLandingEffects,
+} from './cellEffects.js';
+import { dropBananaIfArmed, stepRocketsForOwner, activateSimpleItem } from './lootbox.js';
+import { computeRoundBoxAssignment } from '../data/lootbox.js';
 
 let questionList = [];
 
@@ -41,25 +48,35 @@ function getPhaseConfig(state) {
 }
 
 function advancePhase(state) {
-  state.turnPhase = 'roll1';
+  const p = currentPlayer(state);
+  if (p.pendingEffects.skipNextRoll1) {
+    p.pendingEffects.skipNextRoll1 = false;
+    addLog(state, `Pedina ${p.name}: salta il Dado 1 (colpita dal razzo)`);
+    state.turnPhase = 'question';
+  } else {
+    state.turnPhase = 'roll1';
+  }
   saveState();
 }
 
 function rollDice1(state) {
   const p = currentPlayer(state);
+  dropBananaIfArmed(state, p, addLog);
+
   const rawRoll = rollDie();
   state.currentTurn.roll1 = rawRoll;
 
-  const { wasBoosted, wasMuddy, wasPuddleArmed } = consumeRoll1PendingEffects(p);
+  const { wasPuddleArmed } = consumeRoll1PendingEffects(p);
 
   if (wasPuddleArmed && rawRoll === 6) {
     p.progress = p.pendingEffects.puddleReturnProgress;
+    clearRoll1Modifiers(p);
     addLog(state, `Pedina ${p.name}: Dado 1 = 6, cade nella pozza e torna indietro!`);
   } else {
-    const movement = applyRoll1Modifier(rawRoll, wasBoosted, wasMuddy);
+    const { movement, label } = resolveRoll1Movement(rawRoll, p);
+    clearRoll1Modifiers(p);
     moveProgress(state, p, movement);
-    const note = wasBoosted ? ' (boost)' : wasMuddy ? ' (fango)' : '';
-    addLog(state, `Pedina ${p.name}: Dado 1 = ${rawRoll}${note} -> avanza di ${movement}`);
+    addLog(state, `Pedina ${p.name}: Dado 1 = ${rawRoll}${label} -> avanza di ${movement}`);
   }
 
   applyLandingEffects(state, p, addLog);
@@ -90,11 +107,22 @@ function evaluate(state, correct) {
 
 function rollDice2(state) {
   const p = currentPlayer(state);
+  dropBananaIfArmed(state, p, addLog);
+
   const roll = rollDie();
   state.currentTurn.roll2 = roll;
-  const delta = state.currentTurn.correct ? roll : -roll;
-  moveProgress(state, p, delta);
-  addLog(state, `Pedina ${p.name}: Dado 2 = ${roll} (${delta >= 0 ? '+' : ''}${delta})`);
+
+  const hadNoMalus = p.pendingEffects.noMalusActive;
+  p.pendingEffects.noMalusActive = false;
+
+  if (!state.currentTurn.correct && hadNoMalus) {
+    addLog(state, `Pedina ${p.name}: Dado 2 = ${roll}, ma No Malus annulla la retrocessione`);
+  } else {
+    const delta = state.currentTurn.correct ? roll : -roll;
+    moveProgress(state, p, delta);
+    addLog(state, `Pedina ${p.name}: Dado 2 = ${roll} (${delta >= 0 ? '+' : ''}${delta})`);
+  }
+
   if (p.finished) {
     addLog(state, `Pedina ${p.name} ha tagliato il traguardo!`);
     state.raceStatus = 'finished';
@@ -108,13 +136,31 @@ function rollDice2(state) {
 
 function nextTurn(state) {
   if (state.raceStatus === 'finished') return;
+
+  const finishingPlayer = currentPlayer(state);
+  if (finishingPlayer.pendingEffects.shieldTurnsLeft > 0) {
+    finishingPlayer.pendingEffects.shieldTurnsLeft -= 1;
+  }
+
   let next = state.currentPlayerIndex;
+  let wrapped = false;
   do {
+    const prev = next;
     next = (next + 1) % state.players.length;
+    if (next <= prev) wrapped = true;
   } while (state.players[next].finished && next !== state.currentPlayerIndex);
+
   state.currentPlayerIndex = next;
+  const newCurrent = state.players[next];
+  stepRocketsForOwner(state, newCurrent.id, addLog);
+
   state.currentTurn = { roll1: null, question: null, roll2: null, correct: null };
   state.turnPhase = 'start';
+
+  if (wrapped || !state.roundBoxAssignment) {
+    state.roundBoxAssignment = computeRoundBoxAssignment(state);
+  }
+
   saveState();
 }
 
@@ -122,6 +168,21 @@ function manualMove(state, playerId, delta) {
   const p = state.players.find((pl) => pl.id === playerId);
   moveProgress(state, p, delta);
   addLog(state, `Correzione manuale: Pedina ${p.name} ${delta >= 0 ? '+' : ''}${delta}`);
+  saveState();
+}
+
+function activateLoot(state, direction) {
+  const p = currentPlayer(state);
+  const itemId = p.lootbox;
+  if (!itemId) return;
+  p.lootbox = null;
+
+  if (itemId === 'redraw') {
+    state.currentTurn.question = drawQuestion(state, questionList);
+    addLog(state, `Pedina ${p.name}: Ritira la domanda -> nuova domanda estratta`);
+  } else {
+    activateSimpleItem(state, p, itemId, direction, addLog, moveProgress, applyLandingEffects);
+  }
   saveState();
 }
 
@@ -137,5 +198,6 @@ export {
   rollDice2,
   nextTurn,
   manualMove,
+  activateLoot,
   addLog,
 };
