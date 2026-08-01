@@ -19,18 +19,6 @@
   font-weight: 800;
 }
 
-.finish-banner {
-  display: none;
-  background: var(--color-accent);
-  color: #1b2432;
-  font-size: 1.8em;
-  font-weight: 800;
-  text-align: center;
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 12px;
-}
-
 .game-main {
   display: flex;
   gap: 24px;

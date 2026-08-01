@@ -1,3 +1,5 @@
+import { PLAYER_COLORS } from '../state.js';
+
 let modalRoot;
 
 function init(root) {
@@ -143,4 +145,59 @@ function showLootActivation(item, onActivate) {
   modalRoot.appendChild(box);
 }
 
-export { init, hide, showConfirm, showManualAdjust, showLootActivation };
+function showRaceResults(state, onBackToMenu) {
+  modalRoot.innerHTML = '';
+  modalRoot.classList.add('open');
+
+  const box = document.createElement('div');
+  box.className = 'modal-box modal-results';
+
+  const title = document.createElement('h2');
+  title.textContent = state.endedManually ? 'Gara terminata dal formatore' : 'Gara terminata!';
+  box.appendChild(title);
+
+  const standings = [...state.players].sort((a, b) => b.progress - a.progress);
+  const list = document.createElement('div');
+  list.className = 'results-list';
+  standings.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'results-row';
+    if (i === 0) row.classList.add('results-first');
+
+    const pos = document.createElement('span');
+    pos.className = 'results-pos';
+    pos.textContent = `${i + 1}°`;
+
+    const dot = document.createElement('span');
+    dot.className = 'player-dot';
+    dot.style.background = PLAYER_COLORS[p.colorId].hex;
+
+    const name = document.createElement('span');
+    name.className = 'results-name';
+    name.textContent = `${p.icon ? p.icon + ' ' : ''}${p.name}`;
+
+    const info = document.createElement('span');
+    info.className = 'results-info';
+    info.textContent = p.finished ? 'Arrivato' : `Casella ${p.progress}`;
+
+    row.append(pos, dot, name, info);
+    list.appendChild(row);
+  });
+  box.appendChild(list);
+
+  const btnRow = document.createElement('div');
+  btnRow.className = 'modal-actions';
+  const backBtn = document.createElement('button');
+  backBtn.textContent = 'Torna al Menu';
+  backBtn.className = 'btn btn-primary';
+  backBtn.onclick = () => {
+    hide();
+    onBackToMenu();
+  };
+  btnRow.appendChild(backBtn);
+  box.appendChild(btnRow);
+
+  modalRoot.appendChild(box);
+}
+
+export { init, hide, showConfirm, showManualAdjust, showLootActivation, showRaceResults };

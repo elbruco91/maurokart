@@ -13,11 +13,12 @@ const PLAYER_COLORS = {
 
 let state = null;
 
-function createPlayer(id, name, colorId) {
+function createPlayer(id, name, colorId, icon) {
   return {
     id,
     name,
     colorId,
+    icon: icon || null,
     progress: 0,
     lootbox: null,
     finished: false,
@@ -36,24 +37,44 @@ function createPlayer(id, name, colorId) {
   };
 }
 
-function createTestState() {
+function shuffleArray(list) {
+  const copy = [...list];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function createRaceState({ trackId, laps, players, startOrder }) {
+  const ordered = startOrder === 'random' ? shuffleArray(players) : players;
   return {
-    raceConfig: { trackId: 'breve', laps: 2 },
-    players: [
-      createPlayer(1, 'Rosso', 1),
-      createPlayer(2, 'Blu', 3),
-      createPlayer(3, 'Verde', 5),
-    ],
+    raceConfig: { trackId, laps },
+    players: ordered.map((p) => createPlayer(p.slot, p.name, p.slot, p.icon)),
     currentPlayerIndex: 0,
     turnPhase: 'start',
     currentTurn: { roll1: null, question: null, roll2: null, correct: null, redrawCredit: false },
     history: [],
     raceStatus: 'inProgress',
     winnerId: null,
+    endedManually: false,
     trackHazards: {},
     activeRockets: [],
     roundBoxAssignment: null,
   };
+}
+
+function createTestState() {
+  return createRaceState({
+    trackId: 'breve',
+    laps: 2,
+    startOrder: 'manual',
+    players: [
+      { slot: 1, name: 'Rosso' },
+      { slot: 2, name: 'Grigio' },
+      { slot: 3, name: 'Blu' },
+    ],
+  });
 }
 
 function getState() {
@@ -92,6 +113,7 @@ function hasSavedState() {
 export {
   PLAYER_COLORS,
   createTestState,
+  createRaceState,
   getState,
   setState,
   saveState,

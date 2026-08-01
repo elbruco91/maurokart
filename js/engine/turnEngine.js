@@ -163,6 +163,14 @@ function nextTurn(state) {
   saveState();
 }
 
+function endRaceManually(state) {
+  if (state.raceStatus === 'finished') return;
+  state.raceStatus = 'finished';
+  state.endedManually = true;
+  addLog(state, 'Il formatore ha terminato la gara manualmente');
+  saveState();
+}
+
 function manualMove(state, playerId, delta) {
   const p = state.players.find((pl) => pl.id === playerId);
   moveProgress(state, p, delta);
@@ -207,5 +215,6 @@ export {
   manualMove,
   activateLoot,
   redrawQuestion,
+  endRaceManually,
   addLog,
 };

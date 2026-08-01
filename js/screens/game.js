@@ -48,6 +48,15 @@ function init(elements, onExit) {
     });
   });
 
+  els.endRaceBtn.addEventListener('click', () => {
+    modals.showConfirm('Terminare la gara adesso? Verra\' mostrata la classifica finale. Confermi?', () => {
+      const s = state.getState();
+      engine.endRaceManually(s);
+      render();
+      modals.showRaceResults(s, onExitCallback);
+    });
+  });
+
   els.lootBtn.addEventListener('click', () => {
     const s = state.getState();
     const p = engine.currentPlayer(s);
@@ -100,11 +109,7 @@ function render() {
   els.lootBtn.disabled = !canUseLoot;
   els.lootBtn.textContent = cp.lootbox ? `Loot: ${LOOT_ITEMS[cp.lootbox].name}` : 'Loot';
 
-  els.finishBanner.style.display = finished ? 'block' : 'none';
-  if (finished) {
-    const winner = s.players.find((p) => p.id === s.winnerId);
-    els.finishBanner.textContent = `Vince ${winner.name}!`;
-  }
+  els.endRaceBtn.disabled = finished;
 }
 
 function renderPlayerList(s) {
@@ -166,6 +171,9 @@ function rollAndAnimate(rollFn, s) {
   animateDie(els.diceEl, roll, () => {
     els.mainAction.disabled = false;
     render();
+    if (s.raceStatus === 'finished') {
+      modals.showRaceResults(s, onExitCallback);
+    }
   });
 }
 

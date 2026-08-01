@@ -6,14 +6,55 @@
 <title>MauroKart</title>
 <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/game.css" />
+<link rel="stylesheet" href="css/setup.css" />
 </head>
 <body>
 
 <section id="screen-menu" class="screen active">
   <div class="menu-box">
     <h1>MauroKart</h1>
-    <p class="menu-subtitle">Fase 1 - motore di gioco (versione di test)</p>
-    <button id="start-test-race-btn" class="btn btn-primary btn-large">Avvia partita di test</button>
+    <p class="menu-subtitle">Fase 5 - setup pre-gara</p>
+    <button id="start-race-btn" class="btn btn-primary btn-large">Inizia gara</button>
+  </div>
+</section>
+
+<section id="screen-setup" class="screen">
+  <div class="setup-box">
+    <h1>Imposta la gara</h1>
+
+    <div class="setup-section">
+      <h2>Tracciato</h2>
+      <div id="track-options" class="option-row"></div>
+    </div>
+
+    <div class="setup-section setup-inline">
+      <div>
+        <h2>Numero di giri</h2>
+        <input id="laps-input" type="number" min="1" max="20" value="2" class="setup-input" />
+      </div>
+      <div>
+        <h2>Numero giocatori</h2>
+        <input id="player-count-input" type="number" min="2" max="8" value="4" class="setup-input" />
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <h2>Ordine di partenza</h2>
+      <div class="option-row">
+        <button id="order-random-btn" class="btn btn-toggle">Casuale</button>
+        <button id="order-manual-btn" class="btn btn-toggle">Manuale</button>
+      </div>
+    </div>
+
+    <div class="setup-section">
+      <h2>Giocatori</h2>
+      <div id="player-rows"></div>
+    </div>
+
+    <div class="setup-actions">
+      <button id="setup-cancel-btn" class="btn btn-outline">Annulla</button>
+      <button id="setup-start-btn" class="btn btn-primary btn-large">Avvia gara</button>
+    </div>
   </div>
 </section>
 
@@ -21,10 +62,9 @@
   <header class="game-header">
     <h1>MauroKart</h1>
     <div class="current-player">Turno di: <span id="current-player-label"></span></div>
+    <button id="end-race-btn" class="btn btn-outline">Termina Gara</button>
     <button id="exit-btn" class="btn btn-outline">Esci / Pausa</button>
   </header>
-
-  <div id="finish-banner" class="finish-banner"></div>
 
   <main class="game-main">
     <div class="track-panel">

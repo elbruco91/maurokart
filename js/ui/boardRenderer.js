@@ -49,7 +49,7 @@ function renderTrack(container, state) {
       pawn.style.gridRow = cell.row + 1;
       pawn.style.background = PLAYER_COLORS[p.colorId].hex;
       pawn.title = p.name;
-      pawn.textContent = p.name[0];
+      pawn.textContent = p.icon || p.name[0];
       const offset = (i - (players.length - 1) / 2) * 14;
       pawn.style.transform = `translateX(${offset}px)`;
       if (p.id === state.players[state.currentPlayerIndex].id && state.raceStatus !== 'finished') {

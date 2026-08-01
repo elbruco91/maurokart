@@ -1,5 +1,6 @@
 import * as state from './state.js';
 import * as gameScreen from './screens/game.js';
+import * as setupScreen from './screens/setup.js';
 import * as modals from './ui/modals.js';
 import { loadQuestions } from './data/questionPool.js';
 import { setQuestions } from './engine/turnEngine.js';
@@ -7,6 +8,7 @@ import { computeRoundBoxAssignment } from './data/lootbox.js';
 
 const screens = {
   menu: document.getElementById('screen-menu'),
+  setup: document.getElementById('screen-setup'),
   game: document.getElementById('screen-game'),
 };
 
@@ -20,8 +22,13 @@ function goToMenu() {
   showScreen('menu');
 }
 
-function startTestRace() {
-  const s = state.createTestState();
+function goToSetup() {
+  setupScreen.show();
+  showScreen('setup');
+}
+
+function startRace(config) {
+  const s = state.createRaceState(config);
   s.roundBoxAssignment = computeRoundBoxAssignment(s);
   state.setState(s);
   showScreen('game');
@@ -45,19 +52,34 @@ async function init() {
       retreatBtn: document.getElementById('retreat-btn'),
       manualAdjustBtn: document.getElementById('manual-adjust-btn'),
       exitBtn: document.getElementById('exit-btn'),
+      endRaceBtn: document.getElementById('end-race-btn'),
       diceEl: document.getElementById('dice'),
       questionBox: document.getElementById('question-box'),
       questionText: document.getElementById('question-text'),
       answerText: document.getElementById('answer-text'),
       redrawBtn: document.getElementById('redraw-btn'),
       currentPlayerLabel: document.getElementById('current-player-label'),
-      finishBanner: document.getElementById('finish-banner'),
     },
     goToMenu,
   );
 
-  const startBtn = document.getElementById('start-test-race-btn');
-  startBtn.addEventListener('click', startTestRace);
+  setupScreen.init(
+    {
+      trackOptions: document.getElementById('track-options'),
+      lapsInput: document.getElementById('laps-input'),
+      playerCountInput: document.getElementById('player-count-input'),
+      orderRandomBtn: document.getElementById('order-random-btn'),
+      orderManualBtn: document.getElementById('order-manual-btn'),
+      playerRows: document.getElementById('player-rows'),
+      cancelBtn: document.getElementById('setup-cancel-btn'),
+      startBtn: document.getElementById('setup-start-btn'),
+    },
+    startRace,
+    goToMenu,
+  );
+
+  const startBtn = document.getElementById('start-race-btn');
+  startBtn.addEventListener('click', goToSetup);
 
   showScreen('menu');
 
@@ -66,7 +88,7 @@ async function init() {
   const questions = await loadQuestions();
   setQuestions(questions);
   startBtn.disabled = false;
-  startBtn.textContent = 'Avvia partita di test';
+  startBtn.textContent = 'Inizia gara';
 }
 
 document.addEventListener('DOMContentLoaded', init);

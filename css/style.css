@@ -134,6 +134,45 @@ h1, h2, h3 {
   border: none;
 }
 
+.modal-results {
+  min-width: 420px;
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.results-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #ffffff0f;
+}
+
+.results-row.results-first {
+  background: var(--color-accent);
+  color: #1b2432;
+  font-weight: 800;
+}
+
+.results-pos {
+  width: 2.2em;
+  font-weight: 800;
+}
+
+.results-name {
+  flex: 1;
+}
+
+.results-info {
+  opacity: 0.8;
+}
+
 .modal-actions {
   display: flex;
   gap: 12px;

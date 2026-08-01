@@ -1,0 +1,84 @@
+.setup-box {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.setup-section {
+  background: var(--color-panel);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.setup-inline {
+  display: flex;
+  gap: 32px;
+}
+
+.setup-input {
+  font-size: 1em;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  width: 100%;
+  max-width: 260px;
+}
+
+.option-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-toggle {
+  background: #3a4a63;
+}
+
+.btn-toggle.active {
+  background: var(--color-accent-dark);
+  color: #1b2432;
+}
+
+.player-setup-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid #ffffff14;
+}
+
+.player-setup-row:last-child {
+  border-bottom: none;
+}
+
+.icon-picker {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.icon-btn {
+  font-size: 1.3em;
+  background: #3a4a63;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.icon-btn.active {
+  border-color: var(--color-accent);
+}
+
+.reorder-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.setup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
