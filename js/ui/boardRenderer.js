@@ -11,9 +11,12 @@ const CELL_ICONS = {
 };
 
 const CELL_GAP = 6;
+const MAX_ANIMATED_HOPS = 20;
 
 let pawnEls = {};
 let rocketEls = {};
+let lastProgress = {};
+let hopAnimations = {};
 let currentTrackId = null;
 
 function getCellSize() {
@@ -26,6 +29,11 @@ function cellPixelCenter(cell, cellSize) {
     x: cell.col * (cellSize + CELL_GAP) + cellSize / 2,
     y: cell.row * (cellSize + CELL_GAP) + cellSize / 2,
   };
+}
+
+function cellForProgress(track, progress) {
+  const idx = ((Math.round(progress) % track.length) + track.length) % track.length;
+  return track.cells[idx];
 }
 
 function renderCells(grid, track, state) {
@@ -61,10 +69,62 @@ function getPawnBadges(player) {
   return badges;
 }
 
-function updatePawn(pawn, player, cellSize, cell, occupantIndex, occupantCount, isActive) {
+function pointToTransform(point, offsetX, scale) {
+  return `translate(${point.x + offsetX}px, ${point.y}px) translate(-50%, -50%) scale(${scale})`;
+}
+
+function buildHopKeyframes(track, fromProgress, toProgress, cellSize, offsetX) {
+  const step = toProgress > fromProgress ? 1 : -1;
+  const hops = Math.abs(Math.round(toProgress) - Math.round(fromProgress));
+  let prevPoint = cellPixelCenter(cellForProgress(track, fromProgress), cellSize);
+  const frames = [{ transform: pointToTransform(prevPoint, offsetX, 1) }];
+
+  for (let i = 1; i <= hops; i++) {
+    const point = cellPixelCenter(cellForProgress(track, fromProgress + i * step), cellSize);
+    const mid = {
+      x: (prevPoint.x + point.x) / 2,
+      y: (prevPoint.y + point.y) / 2 - cellSize * 0.3,
+    };
+    frames.push({ transform: pointToTransform(mid, offsetX, 1.18) });
+    frames.push({ transform: pointToTransform(point, offsetX, 1) });
+    prevPoint = point;
+  }
+  return frames;
+}
+
+function movePawnTo(pawn, track, fromProgress, toProgress, cellSize, offsetX) {
+  const finalPoint = cellPixelCenter(cellForProgress(track, toProgress), cellSize);
+  const finalTransform = pointToTransform(finalPoint, offsetX, 1);
+
+  const prevAnim = hopAnimations[pawn.dataset.playerId];
+  if (prevAnim) prevAnim.cancel();
+
+  const hops = Math.abs(Math.round(toProgress) - Math.round(fromProgress));
+  if (hops === 0 || fromProgress == null) {
+    pawn.style.transform = finalTransform;
+    return;
+  }
+
+  if (hops > MAX_ANIMATED_HOPS) {
+    pawn.style.transition = 'transform 0.5s ease';
+    pawn.style.transform = finalTransform;
+    return;
+  }
+
+  pawn.style.transition = 'none';
+  const frames = buildHopKeyframes(track, fromProgress, toProgress, cellSize, offsetX);
+  const perHop = Math.max(140, Math.min(320, 1600 / hops));
+  pawn.style.transform = finalTransform;
+  const anim = pawn.animate(frames, { duration: perHop * hops, easing: 'ease-in-out' });
+  hopAnimations[pawn.dataset.playerId] = anim;
+}
+
+function updatePawn(pawn, player, cellSize, track, occupantIndex, occupantCount, isActive) {
   const offset = (occupantIndex - (occupantCount - 1) / 2) * (cellSize * 0.32);
-  const { x, y } = cellPixelCenter(cell, cellSize);
-  pawn.style.transform = `translate(${x + offset}px, ${y}px) translate(-50%, -50%)`;
+  const from = lastProgress[player.id];
+  movePawnTo(pawn, track, from, player.progress, cellSize, offset);
+  lastProgress[player.id] = player.progress;
+
   pawn.style.background = PLAYER_COLORS[player.colorId].hex;
   pawn.title = player.name;
   pawn.querySelector('.pawn-icon').textContent = player.icon || player.name[0];
@@ -105,6 +165,8 @@ function renderTrack(container, state) {
     container.innerHTML = '';
     pawnEls = {};
     rocketEls = {};
+    lastProgress = {};
+    hopAnimations = {};
     currentTrackId = track.id;
 
     const grid = document.createElement('div');
@@ -137,20 +199,20 @@ function renderTrack(container, state) {
   });
 
   const seenPlayers = new Set();
-  Object.entries(occupants).forEach(([cellIndex, players]) => {
-    const cell = track.cells[Number(cellIndex)];
+  Object.entries(occupants).forEach(([, players]) => {
     players.forEach((p, i) => {
       seenPlayers.add(p.id);
       let pawn = pawnEls[p.id];
       if (!pawn) {
         pawn = document.createElement('div');
         pawn.className = 'pawn';
+        pawn.dataset.playerId = p.id;
         pawn.innerHTML = '<span class="pawn-icon"></span><span class="pawn-badges"></span>';
         overlay.appendChild(pawn);
         pawnEls[p.id] = pawn;
       }
       const isActive = p.id === currentId && state.raceStatus !== 'finished';
-      updatePawn(pawn, p, cellSize, cell, i, players.length, isActive);
+      updatePawn(pawn, p, cellSize, track, i, players.length, isActive);
     });
   });
 
@@ -158,6 +220,8 @@ function renderTrack(container, state) {
     if (!seenPlayers.has(Number(id))) {
       pawnEls[id].remove();
       delete pawnEls[id];
+      delete lastProgress[id];
+      delete hopAnimations[id];
     }
   });
 
