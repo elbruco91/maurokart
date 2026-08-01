@@ -51,7 +51,7 @@ function init(elements, onExit) {
       const s = state.getState();
       engine.endRaceManually(s);
       render();
-      modals.showRaceResults(s, onExitCallback);
+      modals.showRaceResults(s, onFinishExit);
     });
   });
 
@@ -175,7 +175,7 @@ function rollAndAnimate(rollFn, s) {
     els.mainAction.disabled = false;
     render();
     if (s.raceStatus === 'finished') {
-      modals.showRaceResults(s, onExitCallback);
+      modals.showRaceResults(s, onFinishExit);
     }
   });
 }
@@ -183,6 +183,11 @@ function rollAndAnimate(rollFn, s) {
 function handleEvaluate(correct) {
   engine.evaluate(state.getState(), correct);
   render();
+}
+
+function onFinishExit() {
+  state.clearState();
+  onExitCallback();
 }
 
 export { init, render };

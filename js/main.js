@@ -2,6 +2,8 @@ import * as state from './state.js';
 import * as gameScreen from './screens/game.js';
 import * as setupScreen from './screens/setup.js';
 import * as editorScreen from './screens/editor.js';
+import * as rulesScreen from './screens/rules.js';
+import * as settingsScreen from './screens/settings.js';
 import * as modals from './ui/modals.js';
 import { loadQuestions } from './data/questionPool.js';
 import { setQuestions } from './engine/turnEngine.js';
@@ -11,8 +13,12 @@ const screens = {
   menu: document.getElementById('screen-menu'),
   setup: document.getElementById('screen-setup'),
   editor: document.getElementById('screen-editor'),
+  rules: document.getElementById('screen-rules'),
+  settings: document.getElementById('screen-settings'),
   game: document.getElementById('screen-game'),
 };
+
+let resumeBtn;
 
 function showScreen(name) {
   Object.entries(screens).forEach(([key, el]) => {
@@ -21,6 +27,7 @@ function showScreen(name) {
 }
 
 function goToMenu() {
+  resumeBtn.style.display = state.hasSavedState() ? '' : 'none';
   showScreen('menu');
 }
 
@@ -36,10 +43,31 @@ function goToEditor() {
   });
 }
 
+function goToRules() {
+  rulesScreen.show();
+  showScreen('rules');
+}
+
+function goToSettings() {
+  settingsScreen.show();
+  showScreen('settings');
+}
+
 function startRace(config) {
   const s = state.createRaceState(config);
   s.roundBoxAssignment = computeRoundBoxAssignment(s);
   state.setState(s);
+  state.saveState();
+  showScreen('game');
+  gameScreen.render();
+}
+
+function resumeRace() {
+  const s = state.loadState();
+  if (!s) {
+    goToMenu();
+    return;
+  }
   showScreen('game');
   gameScreen.render();
 }
@@ -108,13 +136,37 @@ async function init() {
     goToMenu,
   );
 
+  rulesScreen.init(
+    {
+      content: document.getElementById('rules-content'),
+      backBtn: document.getElementById('rules-back-btn'),
+    },
+    goToMenu,
+  );
+
+  settingsScreen.init(
+    {
+      questionsStatus: document.getElementById('questions-status'),
+      questionsFileInput: document.getElementById('questions-file-input'),
+      questionsResetBtn: document.getElementById('questions-reset-btn'),
+      questionsFeedback: document.getElementById('questions-feedback'),
+      tracksResetBtn: document.getElementById('tracks-reset-btn'),
+      backBtn: document.getElementById('settings-back-btn'),
+    },
+    goToMenu,
+  );
+
   const startBtn = document.getElementById('start-race-btn');
   startBtn.addEventListener('click', goToSetup);
 
-  const editorBtn = document.getElementById('open-editor-btn');
-  editorBtn.addEventListener('click', goToEditor);
+  resumeBtn = document.getElementById('resume-race-btn');
+  resumeBtn.addEventListener('click', resumeRace);
 
-  showScreen('menu');
+  document.getElementById('open-editor-btn').addEventListener('click', goToEditor);
+  document.getElementById('open-rules-btn').addEventListener('click', goToRules);
+  document.getElementById('open-settings-btn').addEventListener('click', goToSettings);
+
+  goToMenu();
 
   startBtn.disabled = true;
   startBtn.textContent = 'Caricamento domande...';

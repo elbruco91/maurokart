@@ -82,3 +82,47 @@
   gap: 12px;
   margin-top: 8px;
 }
+
+.rules-box {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.rules-content {
+  background: var(--color-panel);
+  border-radius: 16px;
+  padding: 24px;
+  line-height: 1.55;
+}
+
+.rules-content h2 {
+  margin-top: 0;
+}
+
+.rules-content h2:not(:first-child) {
+  margin-top: 28px;
+}
+
+.rules-content ul {
+  margin: 8px 0;
+  padding-left: 22px;
+}
+
+.rules-content li {
+  margin-bottom: 6px;
+}
+
+.file-input-label {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.settings-status {
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.settings-feedback {
+  min-height: 1.4em;
+  opacity: 0.85;
+}

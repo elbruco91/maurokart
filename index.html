@@ -14,9 +14,12 @@
 <section id="screen-menu" class="screen active">
   <div class="menu-box">
     <h1>MauroKart</h1>
-    <p class="menu-subtitle">Fase 6 - editor piste</p>
+    <p class="menu-subtitle">Gioco didattico a turni</p>
     <button id="start-race-btn" class="btn btn-primary btn-large">Inizia gara</button>
+    <button id="resume-race-btn" class="btn btn-primary btn-large">Riprendi partita</button>
+    <button id="open-settings-btn" class="btn btn-outline btn-large">Impostazioni avanzate</button>
     <button id="open-editor-btn" class="btn btn-outline btn-large">Editor Piste</button>
+    <button id="open-rules-btn" class="btn btn-outline btn-large">Come si gioca / Regole</button>
   </div>
 </section>
 
@@ -97,6 +100,43 @@
       <button id="editor-restore-btn" class="btn btn-outline">Ripristina predefinita</button>
       <button id="editor-cancel-btn" class="btn btn-outline">Torna al menu</button>
       <button id="editor-save-btn" class="btn btn-primary btn-large">Salva pista</button>
+    </div>
+  </div>
+</section>
+
+<section id="screen-rules" class="screen">
+  <div class="rules-box">
+    <h1>Come si gioca</h1>
+    <div id="rules-content" class="rules-content"></div>
+    <div class="setup-actions">
+      <button id="rules-back-btn" class="btn btn-primary btn-large">Torna al menu</button>
+    </div>
+  </div>
+</section>
+
+<section id="screen-settings" class="screen">
+  <div class="setup-box">
+    <h1>Impostazioni avanzate</h1>
+
+    <div class="setup-section">
+      <h2>Pool di domande</h2>
+      <p id="questions-status" class="settings-status"></p>
+      <label class="btn btn-loot file-input-label">
+        Carica file domande (.json)
+        <input id="questions-file-input" type="file" accept="application/json" hidden />
+      </label>
+      <button id="questions-reset-btn" class="btn btn-outline">Ripristina domande predefinite</button>
+      <p id="questions-feedback" class="settings-feedback"></p>
+    </div>
+
+    <div class="setup-section">
+      <h2>Piste personalizzate</h2>
+      <p>Elimina tutte le piste salvate dall'editor e ripristina le 3 piste predefinite.</p>
+      <button id="tracks-reset-btn" class="btn btn-outline">Ripristina tutte le piste predefinite</button>
+    </div>
+
+    <div class="setup-actions">
+      <button id="settings-back-btn" class="btn btn-primary btn-large">Torna al menu</button>
     </div>
   </div>
 </section>

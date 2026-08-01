@@ -1,4 +1,5 @@
 const DEFAULT_QUESTIONS_URL = 'data/questions.json';
+const CUSTOM_QUESTIONS_KEY = 'maurokart_custom_questions';
 
 const FALLBACK_QUESTIONS = [
   { domanda: 'Quanto fa 2 + 2?', risposta: '4' },
@@ -7,13 +8,43 @@ const FALLBACK_QUESTIONS = [
   { domanda: 'Quanto fa 12 : 4?', risposta: '3' },
 ];
 
+function isValidQuestionList(data) {
+  return (
+    Array.isArray(data) &&
+    data.length > 0 &&
+    data.every((q) => q && typeof q.domanda === 'string' && typeof q.risposta === 'string')
+  );
+}
+
+function saveCustomQuestions(list) {
+  localStorage.setItem(CUSTOM_QUESTIONS_KEY, JSON.stringify(list));
+}
+
+function loadCustomQuestions() {
+  const raw = localStorage.getItem(CUSTOM_QUESTIONS_KEY);
+  if (!raw) return null;
+  try {
+    const data = JSON.parse(raw);
+    return isValidQuestionList(data) ? data : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function clearCustomQuestions() {
+  localStorage.removeItem(CUSTOM_QUESTIONS_KEY);
+}
+
 async function loadQuestions(url = DEFAULT_QUESTIONS_URL) {
+  const custom = loadCustomQuestions();
+  if (custom) return custom;
+
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    if (Array.isArray(data) && data.length > 0) return data;
-    throw new Error('pool vuoto');
+    if (isValidQuestionList(data)) return data;
+    throw new Error('pool vuoto o non valido');
   } catch (e) {
     console.warn(`Impossibile caricare ${url}, uso il pool di riserva.`, e);
     return FALLBACK_QUESTIONS;
@@ -37,4 +68,13 @@ function drawQuestion(state, questions) {
   return questions[pick];
 }
 
-export { loadQuestions, drawQuestion, FALLBACK_QUESTIONS, DEFAULT_QUESTIONS_URL };
+export {
+  loadQuestions,
+  drawQuestion,
+  isValidQuestionList,
+  saveCustomQuestions,
+  loadCustomQuestions,
+  clearCustomQuestions,
+  FALLBACK_QUESTIONS,
+  DEFAULT_QUESTIONS_URL,
+};
