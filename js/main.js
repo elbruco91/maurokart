@@ -1,6 +1,7 @@
 import * as state from './state.js';
 import * as gameScreen from './screens/game.js';
 import * as setupScreen from './screens/setup.js';
+import * as editorScreen from './screens/editor.js';
 import * as modals from './ui/modals.js';
 import { loadQuestions } from './data/questionPool.js';
 import { setQuestions } from './engine/turnEngine.js';
@@ -9,6 +10,7 @@ import { computeRoundBoxAssignment } from './data/lootbox.js';
 const screens = {
   menu: document.getElementById('screen-menu'),
   setup: document.getElementById('screen-setup'),
+  editor: document.getElementById('screen-editor'),
   game: document.getElementById('screen-game'),
 };
 
@@ -25,6 +27,13 @@ function goToMenu() {
 function goToSetup() {
   setupScreen.show();
   showScreen('setup');
+}
+
+function goToEditor() {
+  modals.showPasswordPrompt(() => {
+    editorScreen.show();
+    showScreen('editor');
+  });
 }
 
 function startRace(config) {
@@ -78,8 +87,32 @@ async function init() {
     goToMenu,
   );
 
+  editorScreen.init(
+    {
+      trackSelect: document.getElementById('editor-track-select'),
+      tabShape: document.getElementById('editor-tab-shape'),
+      tabCells: document.getElementById('editor-tab-cells'),
+      shapeControls: document.getElementById('editor-shape-controls'),
+      cellControls: document.getElementById('editor-cell-controls'),
+      pieceCount: document.getElementById('editor-piece-count'),
+      trackContainer: document.getElementById('editor-track-container'),
+      pieceStraightBtn: document.getElementById('piece-straight-btn'),
+      pieceCurveLeftBtn: document.getElementById('piece-curve-left-btn'),
+      pieceCurveRightBtn: document.getElementById('piece-curve-right-btn'),
+      undoBtn: document.getElementById('piece-undo-btn'),
+      resetBtn: document.getElementById('piece-reset-btn'),
+      restoreBtn: document.getElementById('editor-restore-btn'),
+      cancelBtn: document.getElementById('editor-cancel-btn'),
+      saveBtn: document.getElementById('editor-save-btn'),
+    },
+    goToMenu,
+  );
+
   const startBtn = document.getElementById('start-race-btn');
   startBtn.addEventListener('click', goToSetup);
+
+  const editorBtn = document.getElementById('open-editor-btn');
+  editorBtn.addEventListener('click', goToEditor);
 
   showScreen('menu');
 

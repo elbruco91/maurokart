@@ -36,6 +36,46 @@ function cellForProgress(track, progress) {
   return track.cells[idx];
 }
 
+function dirBetween(a, b) {
+  if (b.row === a.row + 1) return 'South';
+  if (b.row === a.row - 1) return 'North';
+  if (b.col === a.col + 1) return 'East';
+  if (b.col === a.col - 1) return 'West';
+  return null;
+}
+
+const OPPOSITE_SIDE = { East: 'West', West: 'East', North: 'South', South: 'North' };
+const ALL_SIDES = ['North', 'East', 'South', 'West'];
+const CORNER_FROM_SIDES = {
+  'West,South': 'SW',
+  'South,West': 'SW',
+  'West,North': 'NW',
+  'North,West': 'NW',
+  'East,South': 'SE',
+  'South,East': 'SE',
+  'East,North': 'NE',
+  'North,East': 'NE',
+};
+
+function getCurveSides(cells, index) {
+  if (index <= 0 || index >= cells.length - 1) return null;
+  const dirIn = dirBetween(cells[index - 1], cells[index]);
+  const dirOut = dirBetween(cells[index], cells[index + 1]);
+  if (!dirIn || !dirOut || dirIn === dirOut) return null;
+  const entrySide = OPPOSITE_SIDE[dirIn];
+  const exitSide = dirOut;
+  const outerSides = ALL_SIDES.filter((s) => s !== entrySide && s !== exitSide);
+  const innerCorner = CORNER_FROM_SIDES[`${entrySide},${exitSide}`];
+  return { outerSides, innerCorner };
+}
+
+function checkerOrientation(cells, index) {
+  const neighbor = index === 0 ? cells[1] : cells[cells.length - 2];
+  if (!neighbor) return 'vertical';
+  const self = cells[index];
+  return neighbor.row === self.row ? 'vertical' : 'horizontal';
+}
+
 function renderCells(grid, track, state) {
   grid.innerHTML = '';
   track.cells.forEach((cell) => {
@@ -43,13 +83,33 @@ function renderCells(grid, track, state) {
     div.className = `cell cell-${cell.type}`;
     div.style.gridColumn = cell.col + 1;
     div.style.gridRow = cell.row + 1;
-    if (cell.index === 0) div.classList.add('cell-start');
+
     const hazard = state.trackHazards[cell.index];
     const icon = hazard ? '≈' : CELL_ICONS[cell.type];
     if (hazard) div.classList.add('cell-hazard');
     div.innerHTML = icon
       ? `<span class="cell-num">${cell.index + 1}</span><span class="cell-icon">${icon}</span>`
       : `<span class="cell-num">${cell.index + 1}</span>`;
+
+    if (cell.index === 0 || cell.index === track.cells.length - 1) {
+      div.classList.add(cell.index === 0 ? 'cell-start' : 'cell-finish');
+      const line = document.createElement('span');
+      line.className = `checker-line ${checkerOrientation(track.cells, cell.index)}`;
+      div.appendChild(line);
+    }
+
+    const curve = getCurveSides(track.cells, cell.index);
+    if (curve) {
+      curve.outerSides.forEach((side) => {
+        const edge = document.createElement('span');
+        edge.className = `curb-edge side-${side}`;
+        div.appendChild(edge);
+      });
+      const inner = document.createElement('span');
+      inner.className = `curb-inner corner-${curve.innerCorner}`;
+      div.appendChild(inner);
+    }
+
     grid.appendChild(div);
   });
 }
@@ -69,8 +129,9 @@ function getPawnBadges(player) {
   return badges;
 }
 
-function pointToTransform(point, offsetX, scale) {
-  return `translate(${point.x + offsetX}px, ${point.y}px) translate(-50%, -50%) scale(${scale})`;
+function pointToTransform(point, offsetX, scale, rotateDeg) {
+  const rotate = rotateDeg ? ` rotate(${rotateDeg}deg)` : '';
+  return `translate(${point.x + offsetX}px, ${point.y}px) translate(-50%, -50%) scale(${scale})${rotate}`;
 }
 
 function buildHopKeyframes(track, fromProgress, toProgress, cellSize, offsetX) {
@@ -92,37 +153,61 @@ function buildHopKeyframes(track, fromProgress, toProgress, cellSize, offsetX) {
   return frames;
 }
 
-function movePawnTo(pawn, track, fromProgress, toProgress, cellSize, offsetX) {
+function buildWarpKeyframes(fromPoint, toPoint, offsetX) {
+  return [
+    { transform: pointToTransform(fromPoint, offsetX, 1, 0), opacity: 1, offset: 0 },
+    { transform: pointToTransform(fromPoint, offsetX, 0.1, 300), opacity: 0.15, offset: 0.45 },
+    { transform: pointToTransform(toPoint, offsetX, 0.1, 300), opacity: 0.15, offset: 0.55 },
+    { transform: pointToTransform(toPoint, offsetX, 1, 600), opacity: 1, offset: 1 },
+  ];
+}
+
+function movePawnTo(pawn, track, fromProgress, toProgress, cellSize, offsetX, isTeleport) {
   const finalPoint = cellPixelCenter(cellForProgress(track, toProgress), cellSize);
   const finalTransform = pointToTransform(finalPoint, offsetX, 1);
 
   const prevAnim = hopAnimations[pawn.dataset.playerId];
   if (prevAnim) prevAnim.cancel();
 
-  const hops = Math.abs(Math.round(toProgress) - Math.round(fromProgress));
-  if (hops === 0 || fromProgress == null) {
+  if (fromProgress == null) {
     pawn.style.transform = finalTransform;
+    return;
+  }
+
+  const hops = Math.abs(Math.round(toProgress) - Math.round(fromProgress));
+  if (hops === 0) {
+    pawn.style.transform = finalTransform;
+    return;
+  }
+
+  pawn.style.transform = finalTransform;
+
+  if (isTeleport) {
+    const fromPoint = cellPixelCenter(cellForProgress(track, fromProgress), cellSize);
+    const frames = buildWarpKeyframes(fromPoint, finalPoint, offsetX);
+    hopAnimations[pawn.dataset.playerId] = pawn.animate(frames, { duration: 650, easing: 'ease-in-out' });
     return;
   }
 
   if (hops > MAX_ANIMATED_HOPS) {
-    pawn.style.transition = 'transform 0.5s ease';
-    pawn.style.transform = finalTransform;
+    hopAnimations[pawn.dataset.playerId] = pawn.animate(
+      [{ transform: pointToTransform(cellPixelCenter(cellForProgress(track, fromProgress), cellSize), offsetX, 1) }, { transform: finalTransform }],
+      { duration: 500, easing: 'ease' },
+    );
     return;
   }
 
-  pawn.style.transition = 'none';
   const frames = buildHopKeyframes(track, fromProgress, toProgress, cellSize, offsetX);
   const perHop = Math.max(140, Math.min(320, 1600 / hops));
-  pawn.style.transform = finalTransform;
-  const anim = pawn.animate(frames, { duration: perHop * hops, easing: 'ease-in-out' });
-  hopAnimations[pawn.dataset.playerId] = anim;
+  hopAnimations[pawn.dataset.playerId] = pawn.animate(frames, { duration: perHop * hops, easing: 'ease-in-out' });
 }
 
 function updatePawn(pawn, player, cellSize, track, occupantIndex, occupantCount, isActive) {
   const offset = (occupantIndex - (occupantCount - 1) / 2) * (cellSize * 0.32);
   const from = lastProgress[player.id];
-  movePawnTo(pawn, track, from, player.progress, cellSize, offset);
+  const isTeleport = !!player.pendingEffects.justTeleported;
+  movePawnTo(pawn, track, from, player.progress, cellSize, offset, isTeleport);
+  if (isTeleport) player.pendingEffects.justTeleported = false;
   lastProgress[player.id] = player.progress;
 
   pawn.style.background = PLAYER_COLORS[player.colorId].hex;

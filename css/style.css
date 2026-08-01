@@ -123,6 +123,11 @@ h1, h2, h3 {
   font-size: 1.15em;
 }
 
+.modal-error {
+  color: var(--color-danger);
+  font-size: 0.95em;
+}
+
 .modal-box select,
 .modal-box input {
   display: block;

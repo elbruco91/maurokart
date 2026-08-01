@@ -7,14 +7,16 @@
 <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/game.css" />
 <link rel="stylesheet" href="css/setup.css" />
+<link rel="stylesheet" href="css/editor.css" />
 </head>
 <body>
 
 <section id="screen-menu" class="screen active">
   <div class="menu-box">
     <h1>MauroKart</h1>
-    <p class="menu-subtitle">Fase 5 - setup pre-gara</p>
+    <p class="menu-subtitle">Fase 6 - editor piste</p>
     <button id="start-race-btn" class="btn btn-primary btn-large">Inizia gara</button>
+    <button id="open-editor-btn" class="btn btn-outline btn-large">Editor Piste</button>
   </div>
 </section>
 
@@ -54,6 +56,47 @@
     <div class="setup-actions">
       <button id="setup-cancel-btn" class="btn btn-outline">Annulla</button>
       <button id="setup-start-btn" class="btn btn-primary btn-large">Avvia gara</button>
+    </div>
+  </div>
+</section>
+
+<section id="screen-editor" class="screen">
+  <div class="editor-box">
+    <h1>Editor Piste</h1>
+
+    <div class="editor-toolbar">
+      <div id="editor-track-select" class="option-row"></div>
+      <div class="option-row">
+        <button id="editor-tab-shape" class="btn btn-toggle">Forma pista</button>
+        <button id="editor-tab-cells" class="btn btn-toggle">Caselle speciali</button>
+      </div>
+    </div>
+
+    <div class="editor-main">
+      <div class="editor-preview">
+        <div id="editor-track-container"></div>
+      </div>
+
+      <div class="editor-panel">
+        <div id="editor-shape-controls" class="editor-controls">
+          <p id="editor-piece-count"></p>
+          <button id="piece-straight-btn" class="btn btn-loot">Rettilineo</button>
+          <button id="piece-curve-left-btn" class="btn btn-loot">Curva Sinistra</button>
+          <button id="piece-curve-right-btn" class="btn btn-loot">Curva Destra</button>
+          <button id="piece-undo-btn" class="btn btn-outline">Annulla ultimo pezzo</button>
+          <button id="piece-reset-btn" class="btn btn-outline">Ricomincia</button>
+        </div>
+
+        <div id="editor-cell-controls" class="editor-controls">
+          <p>Clicca una casella nell'anteprima per impostarne il tipo.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="setup-actions">
+      <button id="editor-restore-btn" class="btn btn-outline">Ripristina predefinita</button>
+      <button id="editor-cancel-btn" class="btn btn-outline">Torna al menu</button>
+      <button id="editor-save-btn" class="btn btn-primary btn-large">Salva pista</button>
     </div>
   </div>
 </section>

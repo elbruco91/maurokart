@@ -70,6 +70,7 @@ function rollDice1(state) {
 
   if (wasPuddleArmed && rawRoll === 6) {
     p.progress = p.pendingEffects.puddleReturnProgress;
+    p.pendingEffects.justTeleported = true;
     clearRoll1Modifiers(p);
     addLog(state, `Pedina ${p.name}: Dado 1 = 6, cade nella pozza e torna indietro!`);
   } else {

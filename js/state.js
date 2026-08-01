@@ -33,6 +33,7 @@ function createPlayer(id, name, colorId, icon) {
       noMalusActive: false,
       bananaArmed: false,
       skipNextRoll1: false,
+      justTeleported: false,
     },
   };
 }

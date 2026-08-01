@@ -77,9 +77,105 @@
   line-height: 1;
 }
 
-.cell-start {
+.cell-start,
+.cell-finish {
   border-color: var(--color-accent);
   opacity: 1;
+}
+
+.checker-line {
+  position: absolute;
+  z-index: 1;
+  background-image:
+    linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%),
+    linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%);
+  background-size: 7px 7px;
+  background-position: 0 0, 3.5px 3.5px;
+  background-color: #fff;
+  border-radius: 2px;
+}
+
+.checker-line.vertical {
+  top: 3px;
+  bottom: 3px;
+  left: 50%;
+  width: 9px;
+  transform: translateX(-50%);
+}
+
+.checker-line.horizontal {
+  left: 3px;
+  right: 3px;
+  top: 50%;
+  height: 9px;
+  transform: translateY(-50%);
+}
+
+.curb-edge {
+  position: absolute;
+  z-index: 1;
+  background: repeating-linear-gradient(45deg, #fff 0 4px, #d32f2f 4px 8px);
+}
+
+.curb-edge.side-North {
+  top: -2px;
+  left: 5px;
+  right: 5px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.curb-edge.side-South {
+  bottom: -2px;
+  left: 5px;
+  right: 5px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.curb-edge.side-East {
+  right: -2px;
+  top: 5px;
+  bottom: 5px;
+  width: 4px;
+  border-radius: 2px;
+}
+
+.curb-edge.side-West {
+  left: -2px;
+  top: 5px;
+  bottom: 5px;
+  width: 4px;
+  border-radius: 2px;
+}
+
+.curb-inner {
+  position: absolute;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  background: repeating-linear-gradient(45deg, #fff 0 3px, #d32f2f 3px 6px);
+  border-radius: 3px;
+}
+
+.curb-inner.corner-NE {
+  top: 3px;
+  right: 3px;
+}
+
+.curb-inner.corner-NW {
+  top: 3px;
+  left: 3px;
+}
+
+.curb-inner.corner-SE {
+  bottom: 3px;
+  right: 3px;
+}
+
+.curb-inner.corner-SW {
+  bottom: 3px;
+  left: 3px;
 }
 
 .cell-boost {

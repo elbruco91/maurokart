@@ -1,3 +1,5 @@
+import { loadCustomTrack } from './customTracks.js';
+
 function generateSnakeTrack(id, length, cols, specials) {
   const cells = [];
   let row = 0;
@@ -58,7 +60,13 @@ const TRACKS = {
 };
 
 function getTrack(id) {
+  const custom = loadCustomTrack(id);
+  if (custom) return custom;
   return TRACKS[id];
 }
 
-export { TRACKS, getTrack };
+function getDefaultTrack(id) {
+  return TRACKS[id];
+}
+
+export { TRACKS, getTrack, getDefaultTrack };

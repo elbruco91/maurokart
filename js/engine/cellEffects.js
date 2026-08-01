@@ -79,6 +79,7 @@ function applyLandingEffects(state, player, addLog) {
     case 'shortcut_in':
       if (cell.shortcutTarget != null) {
         player.progress = lap * track.length + cell.shortcutTarget;
+        player.pendingEffects.justTeleported = true;
         addLog(state, `Pedina ${player.name}: Scorciatoia! Teletrasportata alla casella ${cell.shortcutTarget + 1}`);
       }
       break;
