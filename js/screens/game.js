@@ -1,6 +1,6 @@
 import * as state from '../state.js';
 import * as engine from '../engine/turnEngine.js';
-import { renderTrack } from '../ui/boardRenderer.js';
+import { renderTrack, flashPawnEffect } from '../ui/boardRenderer.js';
 import { renderLog } from '../ui/log.js';
 import * as modals from '../ui/modals.js';
 import { animateDie } from '../engine/dice.js';
@@ -61,8 +61,13 @@ function init(elements, onExit) {
     const item = LOOT_ITEMS[p.lootbox];
     if (!item) return;
     modals.showLootActivation(item, (direction) => {
+      const wasLightning = p.lootbox === 'lightning';
+      const opponentIds = s.players.filter((pl) => pl.id !== p.id).map((pl) => pl.id);
       engine.activateLoot(s, direction);
       render();
+      if (wasLightning) {
+        flashPawnEffect(opponentIds, 'lightning-flash');
+      }
     });
   });
 
