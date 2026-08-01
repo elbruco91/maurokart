@@ -28,7 +28,6 @@
   align-items: center;
   justify-content: center;
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='8' cy='7' r='2' fill='%23f8bbd0'/%3E%3Ccircle cx='16' cy='7' r='2' fill='%23f8bbd0'/%3E%3Ccircle cx='8' cy='13' r='2' fill='%23f8bbd0'/%3E%3Ccircle cx='16' cy='13' r='2' fill='%23f8bbd0'/%3E%3Ccircle cx='12' cy='10' r='2' fill='%23fff59d'/%3E%3C/svg%3E") 14px 22px / 150px 150px repeat,
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='M3 15 Q4 8 5 3' stroke='%232e7d32' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M8 15 Q8 7 9 2' stroke='%23388e3c' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M12 15 Q13 9 14 4' stroke='%232e7d32' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") 70px 60px / 90px 90px repeat,
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='M3 15 Q4 8 5 3' stroke='%232e7d32' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M8 15 Q8 7 9 2' stroke='%23388e3c' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M12 15 Q13 9 14 4' stroke='%232e7d32' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") 30px 110px / 120px 120px repeat,
     repeating-conic-gradient(#5a9c4a 0% 25%, #4c8c3c 0% 50%) 0 0 / 16px 16px;
