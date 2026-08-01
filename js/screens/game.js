@@ -7,7 +7,7 @@ import { animateDie } from '../engine/dice.js';
 import { PLAYER_COLORS } from '../state.js';
 import { LOOT_ITEMS } from '../data/lootbox.js';
 
-const LOOT_WINDOW_PHASES = ['start', 'roll1', 'question', 'reveal'];
+const LOOT_WINDOW_PHASES = ['start'];
 
 let els = {};
 let onExitCallback = null;
@@ -58,6 +58,11 @@ function init(elements, onExit) {
       render();
     });
   });
+
+  els.redrawBtn.addEventListener('click', () => {
+    engine.redrawQuestion(state.getState());
+    render();
+  });
 }
 
 function render() {
@@ -83,6 +88,9 @@ function render() {
     els.answerText.textContent = s.currentTurn.question.risposta;
     els.answerText.style.display = s.turnPhase === 'evaluate' ? '' : 'none';
   }
+
+  const canRedraw = s.currentTurn.redrawCredit && s.turnPhase === 'reveal';
+  els.redrawBtn.style.display = canRedraw ? '' : 'none';
 
   els.currentPlayerLabel.textContent = engine.currentPlayer(s).name;
   els.currentPlayerLabel.style.color = PLAYER_COLORS[engine.currentPlayer(s).colorId].hex;

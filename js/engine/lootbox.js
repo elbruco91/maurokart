@@ -60,10 +60,8 @@ function stepRocket(state, rocket, addLog) {
   }
 }
 
-function stepRocketsForOwner(state, ownerId, addLog) {
-  state.activeRockets
-    .filter((r) => r.ownerId === ownerId)
-    .forEach((rocket) => stepRocket(state, rocket, addLog));
+function stepAllRockets(state, addLog) {
+  state.activeRockets.slice().forEach((rocket) => stepRocket(state, rocket, addLog));
 }
 
 function launchRocket(state, owner, type, addLog) {
@@ -159,7 +157,7 @@ export {
   consumeShieldIfActive,
   applyMalusWithShield,
   dropBananaIfArmed,
-  stepRocketsForOwner,
+  stepAllRockets,
   launchRocket,
   castLightning,
   activateSimpleItem,

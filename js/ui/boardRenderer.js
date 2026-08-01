@@ -26,7 +26,7 @@ function renderTrack(container, state) {
     div.style.gridRow = cell.row + 1;
     if (cell.index === 0) div.classList.add('cell-start');
     const hazard = state.trackHazards[cell.index];
-    const icon = hazard ? '🍌' : CELL_ICONS[cell.type];
+    const icon = hazard ? '≈' : CELL_ICONS[cell.type];
     if (hazard) div.classList.add('cell-hazard');
     div.innerHTML = icon
       ? `<span class="cell-num">${cell.index + 1}</span><span class="cell-icon">${icon}</span>`

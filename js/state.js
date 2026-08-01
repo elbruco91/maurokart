@@ -46,7 +46,7 @@ function createTestState() {
     ],
     currentPlayerIndex: 0,
     turnPhase: 'start',
-    currentTurn: { roll1: null, question: null, roll2: null, correct: null },
+    currentTurn: { roll1: null, question: null, roll2: null, correct: null, redrawCredit: false },
     history: [],
     raceStatus: 'inProgress',
     winnerId: null,

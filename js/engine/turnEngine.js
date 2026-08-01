@@ -8,7 +8,7 @@ import {
   clearRoll1Modifiers,
   applyLandingEffects,
 } from './cellEffects.js';
-import { dropBananaIfArmed, stepRocketsForOwner, activateSimpleItem } from './lootbox.js';
+import { dropBananaIfArmed, stepAllRockets, activateSimpleItem } from './lootbox.js';
 import { computeRoundBoxAssignment } from '../data/lootbox.js';
 
 let questionList = [];
@@ -151,10 +151,9 @@ function nextTurn(state) {
   } while (state.players[next].finished && next !== state.currentPlayerIndex);
 
   state.currentPlayerIndex = next;
-  const newCurrent = state.players[next];
-  stepRocketsForOwner(state, newCurrent.id, addLog);
+  stepAllRockets(state, addLog);
 
-  state.currentTurn = { roll1: null, question: null, roll2: null, correct: null };
+  state.currentTurn = { roll1: null, question: null, roll2: null, correct: null, redrawCredit: false };
   state.turnPhase = 'start';
 
   if (wrapped || !state.roundBoxAssignment) {
@@ -178,11 +177,19 @@ function activateLoot(state, direction) {
   p.lootbox = null;
 
   if (itemId === 'redraw') {
-    state.currentTurn.question = drawQuestion(state, questionList);
-    addLog(state, `Pedina ${p.name}: Ritira la domanda -> nuova domanda estratta`);
+    state.currentTurn.redrawCredit = true;
+    addLog(state, `Pedina ${p.name}: attiva Ritira la domanda (disponibile quando verra' mostrata)`);
   } else {
     activateSimpleItem(state, p, itemId, direction, addLog, moveProgress, applyLandingEffects);
   }
+  saveState();
+}
+
+function redrawQuestion(state) {
+  if (!state.currentTurn.redrawCredit) return;
+  state.currentTurn.redrawCredit = false;
+  state.currentTurn.question = drawQuestion(state, questionList);
+  addLog(state, `Pedina ${currentPlayer(state).name}: ridisegna la domanda`);
   saveState();
 }
 
@@ -199,5 +206,6 @@ export {
   nextTurn,
   manualMove,
   activateLoot,
+  redrawQuestion,
   addLog,
 };

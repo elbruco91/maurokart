@@ -112,6 +112,8 @@
 }
 
 .cell-hazard {
+  background: #8d5b2d;
+  opacity: 1;
   border-color: #ffee58;
   border-width: 3px;
 }

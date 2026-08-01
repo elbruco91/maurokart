@@ -49,6 +49,7 @@ async function init() {
       questionBox: document.getElementById('question-box'),
       questionText: document.getElementById('question-text'),
       answerText: document.getElementById('answer-text'),
+      redrawBtn: document.getElementById('redraw-btn'),
       currentPlayerLabel: document.getElementById('current-player-label'),
       finishBanner: document.getElementById('finish-banner'),
     },
