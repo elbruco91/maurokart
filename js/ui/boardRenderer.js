@@ -340,4 +340,4 @@ function flashPawnEffect(playerIds, className, duration = 1300) {
   });
 }
 
-export { renderTrack, flashPawnEffect };
+export { renderTrack, flashPawnEffect, roadSidesFor, buildRoadSvg, checkerOrientation };

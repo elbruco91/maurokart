@@ -3,9 +3,9 @@ import { getTrackLength } from '../data/tracks.default.js';
 
 const VEHICLE_ICONS = ['🏎️', '🚗', '🚙', '🚕', '🚓', '🚐', '🚚', '🛵'];
 const TRACK_OPTIONS = [
-  { id: 'pista1', label: 'Pista 1' },
-  { id: 'pista2', label: 'Pista 2' },
-  { id: 'pista3', label: 'Pista 3' },
+  { id: 'pista1', label: 'GP Calmo' },
+  { id: 'pista2', label: 'GP Pro' },
+  { id: 'pista3', label: 'GP Aura' },
 ];
 
 let els = {};

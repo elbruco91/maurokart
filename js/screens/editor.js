@@ -1,12 +1,13 @@
 import { piecesToCells, cellsToPieces } from '../engine/pieceGeometry.js';
 import { getDefaultTrack } from '../data/tracks.default.js';
 import { saveCustomTrack, loadCustomTrack, clearCustomTrack } from '../data/customTracks.js';
+import { roadSidesFor, buildRoadSvg, checkerOrientation } from '../ui/boardRenderer.js';
 import * as modals from '../ui/modals.js';
 
 const TRACK_OPTIONS = [
-  { id: 'pista1', label: 'Pista 1' },
-  { id: 'pista2', label: 'Pista 2' },
-  { id: 'pista3', label: 'Pista 3' },
+  { id: 'pista1', label: 'GP Calmo' },
+  { id: 'pista2', label: 'GP Pro' },
+  { id: 'pista3', label: 'GP Aura' },
 ];
 
 const MAX_PIECES = 60;
@@ -91,10 +92,20 @@ function renderPreview() {
     div.style.gridRow = cell.row + 1;
     if (cell.index === 0) div.classList.add('cell-start');
     if (cell.index === lastIndex) div.classList.add('cell-finish');
+
+    const road = roadSidesFor(cells, cell.index);
+    const roadSvg = road ? buildRoadSvg(road.entrySide, road.exitSide) : '';
     const icon = CELL_TYPE_LABELS[type];
-    div.innerHTML = icon
+    const labelHtml = icon
       ? `<span class="cell-num">${cell.index + 1}</span><span class="cell-icon">${icon}</span>`
       : `<span class="cell-num">${cell.index + 1}</span>`;
+    div.innerHTML = roadSvg + labelHtml;
+
+    if (cell.index === 0 || cell.index === lastIndex) {
+      const line = document.createElement('span');
+      line.className = `checker-line ${checkerOrientation(cells, cell.index)}`;
+      div.appendChild(line);
+    }
 
     if (mode === 'cells') {
       div.classList.add('cell-editable');
