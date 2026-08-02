@@ -2,16 +2,21 @@ import { getTrackForState, getPositionOnTrack } from '../engine/board.js';
 import { PLAYER_COLORS } from '../state.js';
 
 const CELL_ICONS = {
-  boost: '⚡',
-  mud: '≈',
-  puddle: '○',
-  shortcut_in: '➜',
-  shortcut_out: '⬅',
   lootbox: '?',
 };
 
 const CELL_GAP = 1;
 const MAX_ANIMATED_HOPS = 20;
+
+const ROAD_WIDTH = 60;
+const CURB_WIDTH = 7;
+const LANE_WIDTH = 4;
+const EDGE_MID = {
+  North: [50, 0],
+  South: [50, 100],
+  East: [100, 50],
+  West: [0, 50],
+};
 
 let pawnEls = {};
 let rocketEls = {};
@@ -45,29 +50,6 @@ function dirBetween(a, b) {
 }
 
 const OPPOSITE_SIDE = { East: 'West', West: 'East', North: 'South', South: 'North' };
-const ALL_SIDES = ['North', 'East', 'South', 'West'];
-const CORNER_FROM_SIDES = {
-  'West,South': 'SW',
-  'South,West': 'SW',
-  'West,North': 'NW',
-  'North,West': 'NW',
-  'East,South': 'SE',
-  'South,East': 'SE',
-  'East,North': 'NE',
-  'North,East': 'NE',
-};
-
-function getCurveSides(cells, index) {
-  if (index <= 0 || index >= cells.length - 1) return null;
-  const dirIn = dirBetween(cells[index - 1], cells[index]);
-  const dirOut = dirBetween(cells[index], cells[index + 1]);
-  if (!dirIn || !dirOut || dirIn === dirOut) return null;
-  const entrySide = OPPOSITE_SIDE[dirIn];
-  const exitSide = dirOut;
-  const outerSides = ALL_SIDES.filter((s) => s !== entrySide && s !== exitSide);
-  const innerCorner = CORNER_FROM_SIDES[`${entrySide},${exitSide}`];
-  return { outerSides, innerCorner };
-}
 
 function checkerOrientation(cells, index) {
   const neighbor = index === 0 ? cells[1] : cells[cells.length - 2];
@@ -76,20 +58,41 @@ function checkerOrientation(cells, index) {
   return neighbor.row === self.row ? 'vertical' : 'horizontal';
 }
 
-function roadOrientation(cells, index) {
+function roadSidesFor(cells, index) {
   if (cells.length < 2) return null;
   if (index === 0) {
     const dir = dirBetween(cells[0], cells[1]);
-    return dir === 'East' || dir === 'West' ? 'horizontal' : 'vertical';
+    if (!dir) return null;
+    return { entrySide: OPPOSITE_SIDE[dir], exitSide: dir };
   }
   if (index === cells.length - 1) {
     const dir = dirBetween(cells[index - 1], cells[index]);
-    return dir === 'East' || dir === 'West' ? 'horizontal' : 'vertical';
+    if (!dir) return null;
+    return { entrySide: OPPOSITE_SIDE[dir], exitSide: dir };
   }
   const dirIn = dirBetween(cells[index - 1], cells[index]);
   const dirOut = dirBetween(cells[index], cells[index + 1]);
-  if (dirIn !== dirOut) return null;
-  return dirIn === 'East' || dirIn === 'West' ? 'horizontal' : 'vertical';
+  if (!dirIn || !dirOut) return null;
+  return { entrySide: OPPOSITE_SIDE[dirIn], exitSide: dirOut };
+}
+
+function roadPathFor(entrySide, exitSide) {
+  const [x1, y1] = EDGE_MID[entrySide];
+  const [x2, y2] = EDGE_MID[exitSide];
+  if (OPPOSITE_SIDE[entrySide] === exitSide) {
+    return `M ${x1} ${y1} L ${x2} ${y2}`;
+  }
+  return `M ${x1} ${y1} Q 50 50 ${x2} ${y2}`;
+}
+
+function buildRoadSvg(entrySide, exitSide) {
+  const d = roadPathFor(entrySide, exitSide);
+  const curbWidth = ROAD_WIDTH + CURB_WIDTH * 2;
+  return `<svg class="cell-road" viewBox="0 0 100 100" preserveAspectRatio="none">
+    <path d="${d}" fill="none" stroke="#d7d1bd" stroke-width="${curbWidth}" stroke-linecap="butt"/>
+    <path d="${d}" fill="none" stroke="#5c5d64" stroke-width="${ROAD_WIDTH}" stroke-linecap="butt"/>
+    <path d="${d}" fill="none" stroke="#eef1f6" stroke-width="${LANE_WIDTH}" stroke-dasharray="10 8" stroke-linecap="butt" opacity="0.85"/>
+  </svg>`;
 }
 
 function renderCells(grid, track, state) {
@@ -103,35 +106,19 @@ function renderCells(grid, track, state) {
     const hazard = state.trackHazards[cell.index];
     const icon = hazard ? '≈' : CELL_ICONS[cell.type];
     if (hazard) div.classList.add('cell-hazard');
-    div.innerHTML = icon
+
+    const road = roadSidesFor(track.cells, cell.index);
+    const roadSvg = road ? buildRoadSvg(road.entrySide, road.exitSide) : '';
+    const labelHtml = icon
       ? `<span class="cell-num">${cell.index + 1}</span><span class="cell-icon">${icon}</span>`
       : `<span class="cell-num">${cell.index + 1}</span>`;
+    div.innerHTML = roadSvg + labelHtml;
 
     if (cell.index === 0 || cell.index === track.cells.length - 1) {
       div.classList.add(cell.index === 0 ? 'cell-start' : 'cell-finish');
       const line = document.createElement('span');
       line.className = `checker-line ${checkerOrientation(track.cells, cell.index)}`;
       div.appendChild(line);
-    }
-
-    const curve = getCurveSides(track.cells, cell.index);
-    if (curve) {
-      curve.outerSides.forEach((side) => {
-        const edge = document.createElement('span');
-        edge.className = `curb-edge side-${side}`;
-        div.appendChild(edge);
-      });
-      const inner = document.createElement('span');
-      inner.className = `curb-inner corner-${curve.innerCorner}`;
-      div.appendChild(inner);
-    } else {
-      const orientation = roadOrientation(track.cells, cell.index);
-      const sides = orientation === 'horizontal' ? ['top', 'bottom'] : orientation === 'vertical' ? ['left', 'right'] : [];
-      sides.forEach((side) => {
-        const edge = document.createElement('span');
-        edge.className = `road-edge side-${side}`;
-        div.appendChild(edge);
-      });
     }
 
     grid.appendChild(div);
